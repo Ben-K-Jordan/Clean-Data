@@ -85,13 +85,11 @@ export default function DataInput({
       </div>
 
       {/* Tab row: Samples | Upload */}
-      <div className="flex items-center gap-3 mb-3">
-        <div className="flex-1">
-          <SampleData onSelect={(data) => { setUploadedFile(null); onChange(data); }} active={value} />
-        </div>
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        <SampleData onSelect={(data) => { setUploadedFile(null); onChange(data); }} active={value} />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex flex-col items-center gap-1 px-3 py-2.5 text-left rounded-polaris border border-dashed border-p-border bg-p-surface hover:border-[#008060] hover:bg-green-50/30 transition-all group shrink-0"
+          className="group flex flex-col items-start gap-1 px-3 py-2.5 text-left rounded-polaris border border-dashed border-p-border bg-p-surface hover:border-[#008060] hover:bg-green-50/30 transition-all"
         >
           <div className="flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 text-p-text-secondary group-hover:text-[#008060] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">

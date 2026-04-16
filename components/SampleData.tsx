@@ -42,7 +42,7 @@ const samples = [
 
 export default function SampleData({ onSelect, active }: SampleDataProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <>
       {samples.map((sample) => {
         const isActive = active === sample.data;
         return (
@@ -69,6 +69,6 @@ export default function SampleData({ onSelect, active }: SampleDataProps) {
           </button>
         );
       })}
-    </div>
+    </>
   );
 }
