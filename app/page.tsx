@@ -124,8 +124,8 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen bg-p-bg">
       <Header />
-      <main className="flex-1 overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-5 py-5 h-full flex flex-col">
+      <main className="flex-1 overflow-auto lg:overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-5 py-5 min-h-full lg:h-full flex flex-col">
           {/* Page header */}
           <div className="mb-4 flex items-end justify-between">
             <h1 className="text-lg font-bold text-p-text tracking-tight">
@@ -197,7 +197,7 @@ export default function Home() {
           </div>
 
           {/* Main content */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.1fr] gap-4 flex-1 min-h-0">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.1fr] gap-4 flex-1 min-h-0 lg:min-h-0 [&>div]:min-h-[500px] lg:[&>div]:min-h-0">
             {/* Left panel: Input */}
             <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
               <DataInput
