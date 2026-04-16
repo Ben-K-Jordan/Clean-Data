@@ -190,39 +190,18 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
       {/* Summary stats */}
       <div className="grid grid-cols-3 gap-2.5 px-5 mb-4">
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-6 h-6 rounded-polaris-sm bg-blue-50 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-          </div>
           <div className="text-xl font-bold text-p-text tabular-nums">
             {result.summary.totalItems}
           </div>
           <div className="text-[11px] text-p-text-secondary">Line Items</div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-6 h-6 rounded-polaris-sm bg-green-50 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-[#047b5d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
           <div className="text-xl font-bold text-[#047b5d] tabular-nums">
             {Math.round(result.summary.matchRate * 100)}%
           </div>
           <div className="text-[11px] text-p-text-secondary">Items Resolved</div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-6 h-6 rounded-polaris-sm bg-purple-50 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
           <div className="flex items-baseline gap-1.5">
             <div className="text-xl font-bold text-p-text tabular-nums">
               {result.summary.processingTimeMs < 1000
