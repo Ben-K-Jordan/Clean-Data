@@ -67,7 +67,7 @@ export default function Header() {
               </div>
             )}
           </div>
-          <div className="w-7 h-7 rounded-full bg-[#36a3ff] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-full bg-[#36a3ff] flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-white/30 hover:ring-offset-1 hover:ring-offset-[#1a1a1a] transition-all hover:scale-110">
             <span className="text-white text-[11px] font-semibold">BJ</span>
           </div>
         </div>
