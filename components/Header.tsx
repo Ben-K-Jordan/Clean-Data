@@ -16,7 +16,7 @@ export default function Header() {
             <span className="text-white font-bold text-sm">S</span>
           </div>
           <span className="text-white/70 text-[13px] font-medium hidden sm:block">
-            Clean Data
+            Shopify
           </span>
         </div>
 
