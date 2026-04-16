@@ -39,6 +39,10 @@ export default function Home() {
         await new Promise((r) => setTimeout(r, 1800 - elapsed));
       }
 
+      // Match displayed time to actual elapsed time the user saw
+      const totalElapsed = Date.now() - startTimeRef.current;
+      data.summary.processingTimeMs = totalElapsed;
+
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
