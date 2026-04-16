@@ -5,8 +5,9 @@ export default function Header() {
     <header className="bg-[#1a1a1a]">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/shopify-bag.svg" alt="Shopify" className="w-7 h-8" />
+          <div className="w-7 h-7 rounded-lg bg-[#95BF47] flex items-center justify-center">
+            <span className="text-white font-bold text-sm">S</span>
+          </div>
           <div className="flex items-center gap-1.5">
             <span className="text-white font-semibold text-[15px] tracking-tight">
               Shopify
