@@ -159,13 +159,12 @@ export default function DataInput({
         onDragLeave={handleDragLeave}
       >
         {uploadedImagePreview ? (
-          <div className="w-full h-full min-h-0 bg-p-surface border border-p-border rounded-polaris p-4 flex flex-col items-center justify-center gap-3 shadow-polaris-sm relative overflow-hidden">
-            <div className="relative w-full flex-1 min-h-0 max-w-full flex items-center justify-center" style={{ maxHeight: "55vh" }}>
+          <div className="w-full h-full min-h-0 bg-p-surface border border-p-border rounded-polaris shadow-polaris-sm relative overflow-auto">
+            <div className="relative p-4 flex justify-center">
               <img
                 src={uploadedImagePreview}
                 alt="Uploaded order"
-                className="max-h-full max-w-full object-contain rounded-polaris border border-p-border-secondary shadow-polaris-sm"
-                style={{ maxHeight: "55vh" }}
+                className="max-w-full rounded-polaris border border-p-border-secondary shadow-polaris-sm"
               />
               {/* Scanning overlay — blue transparent bar sweeping down then up */}
               {isScanning && (
@@ -174,19 +173,6 @@ export default function DataInput({
                 </div>
               )}
             </div>
-            <p className="text-[11px] text-p-text-secondary">
-              {isScanning ? (
-                <span className="flex items-center gap-1.5 text-blue-600 font-medium">
-                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Scanning document...
-                </span>
-              ) : (
-                <>Click &quot;Process Order&quot; to scan with AI vision</>
-              )}
-            </p>
           </div>
         ) : (
           <textarea
