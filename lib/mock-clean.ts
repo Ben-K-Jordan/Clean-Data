@@ -258,9 +258,9 @@ function computeConfidence(query: string, match: { name: string; sku: string; al
   } else if (bestSimilarity >= 0.7) {
     return 0.82 + Math.random() * 0.10; // 82-92% — decent match, some abbreviations
   } else if (bestSimilarity >= 0.4) {
-    return 0.68 + Math.random() * 0.12; // 68-80% — messy, typos, abbreviations
+    return 0.72 + Math.random() * 0.10; // 72-82% — messy, typos, abbreviations
   } else {
-    return 0.55 + Math.random() * 0.12; // 55-67% — very fuzzy match
+    return 0.63 + Math.random() * 0.08; // 63-71% — very fuzzy match
   }
 }
 
