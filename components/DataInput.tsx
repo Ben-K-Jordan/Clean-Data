@@ -76,7 +76,7 @@ export default function DataInput({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-[13px] font-semibold text-p-text">Incoming Order</h2>

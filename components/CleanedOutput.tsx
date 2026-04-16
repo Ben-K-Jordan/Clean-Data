@@ -14,7 +14,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   if (!result) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-p-text-secondary">
+      <div className="flex flex-col items-center justify-center h-full text-p-text-secondary p-5">
         <div className="w-16 h-16 rounded-full bg-p-surface-secondary border border-p-border flex items-center justify-center mb-4">
           <svg className="w-7 h-7 text-p-text-secondary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -30,7 +30,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   if (result.items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-p-text-secondary">
+      <div className="flex flex-col items-center justify-center h-full text-p-text-secondary p-5">
         <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
           <svg className="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -88,25 +88,24 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   return (
     <div className="flex flex-col h-full animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
+      {/* Header — padded to align with panel edges */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-4">
         <div>
           <h2 className="text-[13px] font-semibold text-p-text">Order Review</h2>
           <p className="text-[11px] text-p-text-secondary mt-0.5">
             {result.summary.totalItems} line items matched to catalog — review before sending to ERP
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onClear}
-            className="text-[11px] text-p-text-secondary hover:text-p-text transition-colors"
-          >
-            Clear
-          </button>
-        </div>
+        <button
+          onClick={onClear}
+          className="text-[11px] text-p-text-secondary hover:text-p-text transition-colors"
+        >
+          Clear
+        </button>
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-2.5 mb-4">
+      <div className="grid grid-cols-3 gap-2.5 px-5 mb-4">
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-6 h-6 rounded-polaris-sm bg-blue-50 flex items-center justify-center">
@@ -150,24 +149,24 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         </div>
       </div>
 
-      {/* Results table */}
-      <div className="flex-1 overflow-auto border border-p-border rounded-polaris shadow-polaris-sm">
+      {/* Results table — flush to panel edges, cell padding creates alignment */}
+      <div className="flex-1 overflow-auto border-t border-p-border">
         <table className="w-full text-[13px]">
           <thead>
             <tr className="border-b border-p-border bg-p-surface-secondary sticky top-0 z-10">
-              <th className="text-left p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
+              <th className="text-left py-2.5 pl-5 pr-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
                 Product
               </th>
-              <th className="text-left p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
+              <th className="text-left py-2.5 px-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
                 SKU
               </th>
-              <th className="text-right p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
+              <th className="text-right py-2.5 px-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
                 Qty
               </th>
-              <th className="text-right p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
+              <th className="text-right py-2.5 px-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
                 Unit Cost
               </th>
-              <th className="text-right p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
+              <th className="text-right py-2.5 pl-3 pr-5 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
                 Match
               </th>
             </tr>
@@ -178,8 +177,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                 key={i}
                 className={`border-b border-p-border-secondary hover:bg-blue-50/40 transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)}`}
               >
-                <td className="p-3 text-p-text font-medium">{item.product}</td>
-                <td className="p-3">
+                <td className="py-2.5 pl-5 pr-3 text-p-text font-medium">{item.product}</td>
+                <td className="py-2.5 px-3">
                   <span
                     className={`font-mono text-[11px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap inline-block ${
                       item.sku !== "UNKNOWN"
@@ -190,14 +189,14 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                     {item.sku}
                   </span>
                 </td>
-                <td className="p-3 text-right text-p-text tabular-nums font-medium">
+                <td className="py-2.5 px-3 text-right text-p-text tabular-nums font-medium">
                   {item.quantity.toLocaleString()}
                   <span className="text-p-text-secondary text-[11px] ml-1">{item.unit}</span>
                 </td>
-                <td className="p-3 text-right text-p-text tabular-nums">
+                <td className="py-2.5 px-3 text-right text-p-text tabular-nums">
                   ${item.unitPrice.toFixed(2)}
                 </td>
-                <td className="p-3 text-right">
+                <td className="py-2.5 pl-3 pr-5 text-right">
                   <div className="flex items-center justify-end gap-1.5">
                     <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -230,8 +229,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         </table>
       </div>
 
-      {/* Total and actions */}
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-p-border">
+      {/* Footer — padded to match header */}
+      <div className="flex items-center justify-between px-5 py-3 border-t border-p-border">
         <div className="text-[13px] text-p-text-secondary">
           Order Total:{" "}
           <span className="text-p-text font-bold text-base">
