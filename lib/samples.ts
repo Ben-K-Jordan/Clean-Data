@@ -97,7 +97,6 @@ JOGGERS:
 ---------- from marcus's email ----------
 
    indgo denim jns 32,120,$24.00
-   100 blk denim 32
 
 shorts r low too smh
    200 khki chino shrts medium + 175 nvy chno shrts med
