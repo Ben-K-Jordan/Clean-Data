@@ -159,8 +159,8 @@ export default function DataInput({
         onDragLeave={handleDragLeave}
       >
         {uploadedImagePreview ? (
-          <div className="w-full h-full bg-p-surface border border-p-border rounded-polaris p-4 flex flex-col items-center justify-center gap-3 shadow-polaris-sm relative overflow-hidden">
-            <div className="relative max-h-[80%] max-w-full">
+          <div className="w-full h-full min-h-0 bg-p-surface border border-p-border rounded-polaris p-4 flex flex-col items-center justify-center gap-3 shadow-polaris-sm relative overflow-hidden">
+            <div className="relative flex-1 min-h-0 max-w-full flex items-center justify-center">
               <img
                 src={uploadedImagePreview}
                 alt="Uploaded order"
