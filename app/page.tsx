@@ -1,20 +1,23 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Header from "@/components/Header";
 import DataInput from "@/components/DataInput";
 import ProcessingView from "@/components/ProcessingView";
 import CleanedOutput from "@/components/CleanedOutput";
 import { CleanResult } from "@/lib/types";
+import { sampleEmail } from "@/lib/samples";
 
 export default function Home() {
   const [rawData, setRawData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<CleanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isDemo, setIsDemo] = useState(false);
   const startTimeRef = useRef(0);
+  const demoAbortRef = useRef(false);
 
-  async function handleClean() {
+  const processOrder = useCallback(async (data: string) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
@@ -24,31 +27,33 @@ export default function Home() {
       const res = await fetch("/api/clean", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawData }),
+        body: JSON.stringify({ rawData: data }),
       });
 
-      const data = await res.json();
+      const json = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to clean data");
+        throw new Error(json.error || "Failed to clean data");
       }
 
-      // Ensure minimum processing time for believable UX
       const elapsed = Date.now() - startTimeRef.current;
       if (elapsed < 1800) {
         await new Promise((r) => setTimeout(r, 1800 - elapsed));
       }
 
-      // Match displayed time to actual elapsed time the user saw
       const totalElapsed = Date.now() - startTimeRef.current;
-      data.summary.processingTimeMs = totalElapsed;
+      json.summary.processingTimeMs = totalElapsed;
 
-      setResult(data);
+      setResult(json);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  async function handleClean() {
+    await processOrder(rawData);
   }
 
   function handleClear() {
@@ -56,19 +61,60 @@ export default function Home() {
     setError(null);
   }
 
+  async function runDemo() {
+    // Reset everything
+    setResult(null);
+    setError(null);
+    setRawData("");
+    setIsDemo(true);
+    demoAbortRef.current = false;
+
+    // Type out the email character by character
+    const text = sampleEmail;
+    const chunkSize = 3; // characters per tick for speed
+    for (let i = 0; i <= text.length; i += chunkSize) {
+      if (demoAbortRef.current) return;
+      const slice = text.slice(0, Math.min(i + chunkSize, text.length));
+      setRawData(slice);
+      await new Promise((r) => setTimeout(r, 12));
+    }
+    setRawData(text);
+
+    // Brief pause before processing
+    await new Promise((r) => setTimeout(r, 600));
+    if (demoAbortRef.current) return;
+
+    // Process
+    await processOrder(text);
+    setIsDemo(false);
+  }
+
   return (
     <div className="flex flex-col h-screen bg-p-bg">
       <Header />
       <main className="flex-1 overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-5 py-5 h-full flex flex-col">
-          {/* Page header — px matches panel inner padding so text aligns */}
-          <div className="mb-4">
-            <h1 className="text-lg font-bold text-p-text tracking-tight">
-              Order Processing
-            </h1>
-            <p className="text-[13px] text-p-text-secondary mt-0.5">
-              Automatically parse incoming orders and match to your product catalog
-            </p>
+          {/* Page header */}
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-p-text tracking-tight">
+                Order Processing
+              </h1>
+              <p className="text-[13px] text-p-text-secondary mt-0.5">
+                Automatically parse incoming orders and match to your product catalog
+              </p>
+            </div>
+            {!result && !isLoading && !isDemo && (
+              <button
+                onClick={runDemo}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm bg-p-fill-brand text-white hover:bg-p-fill-brand-hover transition-all shadow-polaris-sm animate-fade-in"
+              >
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                Run Demo
+              </button>
+            )}
           </div>
 
           {/* Main content */}
@@ -77,9 +123,9 @@ export default function Home() {
             <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
               <DataInput
                 value={rawData}
-                onChange={setRawData}
+                onChange={(v) => { demoAbortRef.current = true; setIsDemo(false); setRawData(v); }}
                 onSubmit={handleClean}
-                isLoading={isLoading}
+                isLoading={isLoading || isDemo}
               />
             </div>
 
