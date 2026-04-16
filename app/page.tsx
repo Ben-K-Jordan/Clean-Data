@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Header from "@/components/Header";
 import DataInput from "@/components/DataInput";
 import ProcessingView from "@/components/ProcessingView";
@@ -13,11 +13,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<CleanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const startTimeRef = useRef(0);
 
   async function handleClean() {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    startTimeRef.current = Date.now();
 
     try {
       const res = await fetch("/api/clean", {
@@ -32,12 +34,23 @@ export default function Home() {
         throw new Error(data.error || "Failed to clean data");
       }
 
+      // Ensure processing view shows for at least 1.5s in mock mode
+      const elapsed = Date.now() - startTimeRef.current;
+      if (elapsed < 1500 && mode === "mock") {
+        await new Promise((r) => setTimeout(r, 1500 - elapsed));
+      }
+
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleClear() {
+    setResult(null);
+    setError(null);
   }
 
   return (
@@ -71,16 +84,22 @@ export default function Home() {
             {/* Right panel: Output */}
             <div className="bg-ventura-bg border border-ventura-border rounded-xl p-5">
               {isLoading ? (
-                <ProcessingView />
+                <ProcessingView startTime={startTimeRef.current} />
               ) : error ? (
                 <div className="flex flex-col items-center justify-center h-full">
                   <div className="text-red-400 text-sm text-center max-w-sm">
                     <p className="font-medium mb-1">Error</p>
                     <p className="text-ventura-muted">{error}</p>
+                    <button
+                      onClick={handleClear}
+                      className="mt-4 px-4 py-1.5 text-xs rounded-md bg-ventura-surface border border-ventura-border text-ventura-muted hover:text-ventura-text transition-colors"
+                    >
+                      Dismiss
+                    </button>
                   </div>
                 </div>
               ) : (
-                <CleanedOutput result={result} />
+                <CleanedOutput result={result} onClear={handleClear} />
               )}
             </div>
           </div>

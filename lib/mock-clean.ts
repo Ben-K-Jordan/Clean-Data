@@ -13,7 +13,7 @@ export function mockClean(rawData: string): CleanResult {
   for (const line of lines) {
     if (isNonDataLine(line)) continue;
 
-    // Handle multi-item lines ("30 copper couplings and 12 tubes of flux paste")
+    // Handle multi-item lines ("75 canvas tote bags and 30 soy candles")
     const segments = splitMultiItem(line);
     for (const seg of segments) {
       const extracted = extractLineItem(seg);
@@ -38,28 +38,33 @@ export function mockClean(rawData: string): CleanResult {
 }
 
 function isNonDataLine(line: string): boolean {
-  const lower = line.toLowerCase().replace(/^[-•*]\s*/, "");
+  const lower = line.toLowerCase().replace(/^[-•*]\s*/, "").trim();
   const skipPatterns = [
     /^(hi|hey|hello|dear|to whom)/,
     /^(thanks|thank you|regards|best|cheers|sincerely)/,
     /^(from|to|subject|date|sent):/,
-    /^(please|could you|can you|i would|we need|i'd like to)/,
+    /^(please|could you|can you|i would|we need|i'd like to|we're running)/,
     /^(let me know|looking forward|attached|see below)/,
     /^[-=]+$/,
-    /^(item|product|description|qty|quantity|price|unit|sku|total)[,|\t]/i,
+    // Table headers
+    /^(item|product|description|qty|quantity|price|unit|sku|total)[,|\t\s]/i,
+    /\|\s*(qty|quantity|uom|unit price)\s*\|?/i,
+    // PO metadata
     /^(purchase order$|po number|^date:|vendor:|bill to|ship to|authorized)/,
-    /^(subtotal|tax \(|^total:|payment terms|net \d)/,
-    /^(can you get|customer wants|here'?s what)/,
-    /^(mike|sarah|john|manager)$/,
+    /^(subtotal|tax\s*\(|^total:|payment terms|net \d)/,
+    // Conversational lines
+    /^(can you|customer wants|here'?s what|we have a)/,
+    // Standalone names/signatures
+    /^[a-z]+$/,
+    // Standalone prices
     /^\$[\d,.]+$/,
-    /^need to place/,
+    // Separator lines
+    /^[|\-=\s]+$/,
   ];
   return skipPatterns.some((p) => p.test(lower));
 }
 
 function splitMultiItem(line: string): string[] {
-  // "Also need 30 copper couplings and 12 tubes of flux paste"
-  // Split on " and " only if both sides contain a number
   const cleaned = line
     .replace(/^[-•*]\s*/, "")
     .replace(/^also\s+need\s+/i, "")
@@ -72,117 +77,106 @@ function splitMultiItem(line: string): string[] {
   return [cleaned];
 }
 
+function parseQty(raw: string): number | null {
+  const n = parseInt(raw, 10);
+  if (isNaN(n) || n <= 0) return null;
+  return n;
+}
+
 function extractLineItem(line: string): LineItem | null {
   const cleaned = line.replace(/^[-•*]\s*/, "").trim();
   if (!cleaned || cleaned.length < 3) return null;
 
-  // Try "product ... need about QTY of those" — check first to avoid CSV parser grabbing wrong numbers
+  // 1. SKU pattern first — "SKU-XXXX | qty" or "qty units of SKU-XXXX"
+  const skuWithQtyAfter = cleaned.match(
+    /(SKU-\d+)\s*[|,\t:]\s*(\d+)/i
+  );
+  if (skuWithQtyAfter) {
+    const qty = parseQty(skuWithQtyAfter[2]);
+    if (qty) return matchToCatalog(skuWithQtyAfter[1], qty, "EA", undefined);
+  }
+
+  const skuWithQtyBefore = cleaned.match(
+    /(\d+)\s*(?:units?\s+(?:of\s+)?)?(?:.*?)?(SKU-\d+)/i
+  );
+  if (skuWithQtyBefore) {
+    const qty = parseQty(skuWithQtyBefore[1]);
+    if (qty) return matchToCatalog(skuWithQtyBefore[2], qty, "EA", undefined);
+  }
+
+  // 2. Tabular: "Product Name | SKU-XXXX | qty | unit | $price"
+  const tableMatch = cleaned.match(
+    /^(.+?)\s*\|\s*(SKU-\d+)\s*\|\s*(\d+)\s*\|\s*(\w+)\s*\|\s*\$?([\d.]+)/i
+  );
+  if (tableMatch) {
+    const qty = parseQty(tableMatch[3]);
+    if (qty) return matchToCatalog(tableMatch[1].trim(), qty, tableMatch[4], parseFloat(tableMatch[5]));
+  }
+
+  // 3. "product ... need about QTY of those"
   const needAboutMatch = cleaned.match(
     /^(.+?)\s*[-–]\s*need\s+(?:about\s+)?(\d+)/i
   );
   if (needAboutMatch) {
-    return matchToCatalog(
-      needAboutMatch[1].trim(),
-      parseInt(needAboutMatch[2]),
-      "EA",
-      undefined
-    );
+    const qty = parseQty(needAboutMatch[2]);
+    if (qty) return matchToCatalog(needAboutMatch[1].trim(), qty, "EA", undefined);
   }
 
-  // Try CSV/TSV format: product, qty, unit, price (only when separated by tab or pipe, or comma followed by a number)
-  const csvMatch = cleaned.match(
-    /^["']?(.+?)["']?\s*[|\t]\s*(\d+)\s*[|\t]?\s*(ea|each|pcs|units?|ft|lf|box|case|roll)?\s*[|\t]?\s*\$?([\d.]+)?/i
-  );
-  if (csvMatch) {
-    return matchToCatalog(
-      csvMatch[1].trim(),
-      parseInt(csvMatch[2]),
-      csvMatch[3] || "EA",
-      csvMatch[4] ? parseFloat(csvMatch[4]) : undefined
-    );
-  }
-
-  // Try strict CSV (comma-separated): product,qty,price
+  // 4. Strict CSV: product,qty,$price
   const strictCsvMatch = cleaned.match(
     /^["']?(.+?)["']?,\s*(\d+)\s*,\s*\$?([\d.]+)/i
   );
   if (strictCsvMatch) {
-    return matchToCatalog(
-      strictCsvMatch[1].trim(),
-      parseInt(strictCsvMatch[2]),
-      "EA",
-      parseFloat(strictCsvMatch[3])
-    );
+    const qty = parseQty(strictCsvMatch[2]);
+    if (qty) return matchToCatalog(strictCsvMatch[1].trim(), qty, "EA", parseFloat(strictCsvMatch[3]));
   }
 
-  // Try "QTY units/rolls/cans of PRODUCT"
+  // 5. Pipe/tab separated: "product | qty | unit | $price"
+  const pipeSepMatch = cleaned.match(
+    /^["']?(.+?)["']?\s*[|\t]\s*(\d+)\s*[|\t]?\s*(ea|each|pcs|units?)?/i
+  );
+  if (pipeSepMatch) {
+    const qty = parseQty(pipeSepMatch[2]);
+    if (qty) {
+      // Check if there's a price further on
+      const priceMatch = cleaned.match(/\$?([\d]+\.[\d]{2})\s*$/);
+      return matchToCatalog(
+        pipeSepMatch[1].trim(), qty, pipeSepMatch[3] || "EA",
+        priceMatch ? parseFloat(priceMatch[1]) : undefined
+      );
+    }
+  }
+
+  // 6. "QTY units/rolls/etc of PRODUCT"
   const unitsOfMatch = cleaned.match(
-    /^(\d+)\s*(?:units?|pcs|rolls?|cans?|tubes?|boxes?)\s+(?:of\s+)?(.+?)(?:\s*\(.*\))?$/i
+    /^(\d+)\s*(?:units?|pcs|packs?|boxes?)\s+(?:of\s+)?(.+?)(?:\s*\(.*\))?$/i
   );
   if (unitsOfMatch && unitsOfMatch[2].trim().length > 2) {
-    return matchToCatalog(
-      unitsOfMatch[2].trim(),
-      parseInt(unitsOfMatch[1]),
-      "EA",
-      undefined
-    );
+    const qty = parseQty(unitsOfMatch[1]);
+    if (qty) return matchToCatalog(unitsOfMatch[2].trim(), qty, "EA", undefined);
   }
 
-  // Try "QTYx PRODUCT" (e.g., "50x 3/4" copper pipes")
+  // 7. "QTYx PRODUCT"
   const qtyXMatch = cleaned.match(
     /^(\d+)\s*[x×]\s*(.+?)(?:\s*[@$]\s*([\d.]+))?$/i
   );
-  if (qtyXMatch) {
-    return matchToCatalog(
-      qtyXMatch[2].trim(),
-      parseInt(qtyXMatch[1]),
-      "EA",
-      qtyXMatch[3] ? parseFloat(qtyXMatch[3]) : undefined
-    );
+  if (qtyXMatch && qtyXMatch[2].trim().length > 2) {
+    const qty = parseQty(qtyXMatch[1]);
+    if (qty) return matchToCatalog(qtyXMatch[2].trim(), qty, "EA", qtyXMatch[3] ? parseFloat(qtyXMatch[3]) : undefined);
   }
 
-  // Try "QTY PRODUCT" (e.g., "300 PVC elbows" or "24 cans of PVC cement")
+  // 8. "QTY PRODUCT" (generic — must be last)
   const qtyProductMatch = cleaned.match(
     /^(\d+)\s+(.+?)(?:\s*[@$]\s*([\d.]+))?$/i
   );
   if (qtyProductMatch && qtyProductMatch[2].trim().length > 2) {
     const desc = qtyProductMatch[2]
-      .replace(/^(?:cans?|rolls?|tubes?|boxes?)\s+(?:of\s+)?/i, "")
+      .replace(/^(?:packs?|boxes?)\s+(?:of\s+)?/i, "")
       .trim();
     if (!/^\$?[\d.,]+$/.test(desc) && !/^(ea|each|pcs|units?)$/i.test(desc)) {
-      return matchToCatalog(
-        desc,
-        parseInt(qtyProductMatch[1]),
-        "EA",
-        qtyProductMatch[3] ? parseFloat(qtyProductMatch[3]) : undefined
-      );
+      const qty = parseQty(qtyProductMatch[1]);
+      if (qty) return matchToCatalog(desc, qty, "EA", qtyProductMatch[3] ? parseFloat(qtyProductMatch[3]) : undefined);
     }
-  }
-
-  // Try SKU in line with quantity: "SKU-4421 | 500 | EA"
-  const skuMatch = cleaned.match(
-    /(SKU-\d+)\s*[|,\t:]\s*(\d+)\s*[|,\t]?\s*(ea|each|pcs|units?)?/i
-  );
-  if (skuMatch) {
-    return matchToCatalog(
-      skuMatch[1],
-      parseInt(skuMatch[2]),
-      skuMatch[3] || "EA",
-      undefined
-    );
-  }
-
-  // Try tabular: "Product Name | SKU-XXXX | qty | unit | $price"
-  const tableMatch = cleaned.match(
-    /^(.+?)\s*\|\s*(SKU-\d+)\s*\|\s*(\d+)\s*\|\s*(\w+)\s*\|\s*\$?([\d.]+)/i
-  );
-  if (tableMatch) {
-    return matchToCatalog(
-      tableMatch[1].trim(),
-      parseInt(tableMatch[3]),
-      tableMatch[4],
-      parseFloat(tableMatch[5])
-    );
   }
 
   return null;

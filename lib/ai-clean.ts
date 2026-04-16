@@ -22,7 +22,7 @@ export async function aiClean(rawData: string): Promise<CleanResult> {
     messages: [
       {
         role: "user",
-        content: `You are a data extraction system for a plumbing/pipe distributor. Parse the following raw input and extract line items, matching them to the product catalog below.
+        content: `You are a data extraction system for an e-commerce retailer. Parse the following raw input and extract line items, matching them to the product catalog below.
 
 PRODUCT CATALOG:
 ${catalogStr}
@@ -38,7 +38,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanation):
       "sku": "SKU-XXXX",
       "quantity": 100,
       "unit": "EA",
-      "unitPrice": 12.40,
+      "unitPrice": 24.99,
       "confidence": 0.95
     }
   ]
@@ -55,21 +55,20 @@ Rules:
     ],
   });
 
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
+  const text = response.content?.[0]?.type === "text" ? response.content[0].text : "";
 
   let items: LineItem[];
   try {
     const parsed = JSON.parse(text);
-    items = parsed.items || [];
+    items = validateItems(parsed.items);
   } catch {
     // Try to extract JSON from the response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
-      items = parsed.items || [];
+      items = validateItems(parsed.items);
     } else {
-      throw new Error("Failed to parse AI response as JSON");
+      throw new Error("Failed to parse AI response. Please try again.");
     }
   }
 
@@ -85,4 +84,21 @@ Rules:
     },
     mode: "ai",
   };
+}
+
+function validateItems(raw: unknown): LineItem[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(
+      (item): item is Record<string, unknown> =>
+        typeof item === "object" && item !== null
+    )
+    .map((item) => ({
+      product: typeof item.product === "string" ? item.product : "Unknown",
+      sku: typeof item.sku === "string" ? item.sku : "UNKNOWN",
+      quantity: typeof item.quantity === "number" && item.quantity > 0 ? item.quantity : 1,
+      unit: typeof item.unit === "string" ? item.unit : "EA",
+      unitPrice: typeof item.unitPrice === "number" ? item.unitPrice : 0,
+      confidence: typeof item.confidence === "number" ? item.confidence : 0,
+    }));
 }
