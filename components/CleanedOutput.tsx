@@ -63,7 +63,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         </div>
         <p className="text-[13px] font-medium text-p-text">Order Review</p>
         <p className="text-[11px] mt-1 text-center max-w-[260px]">
-          Processed orders will appear here for review before pushing to Shopify
+          Processed orders will appear here for review before sending to your ERP
         </p>
       </div>
     );
@@ -156,8 +156,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
               const matched = result.items.filter((i) => i.sku !== "UNKNOWN").length;
               const total = result.summary.totalItems;
               return matched < total
-                ? `${matched} of ${total} line items matched — review before pushing to Shopify`
-                : `${total} line items matched to catalog — review before pushing to Shopify`;
+                ? `${matched} of ${total} line items matched — review before sending to ERP`
+                : `${total} line items matched to catalog — review before sending to ERP`;
             })()}
           </p>
         </div>
@@ -440,7 +440,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Pushed to Shopify
+                Sent to ERP
               </>
             ) : pendingUnknownCount > 0 ? (
               <>
@@ -454,7 +454,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Approve &amp; Push to Shopify
+                Approve &amp; Send to ERP
               </>
             )}
           </button>
