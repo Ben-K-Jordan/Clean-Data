@@ -21,9 +21,13 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   // Track rows that have finished their delete animation (fully collapsed from view)
   const [collapsedRows, setCollapsedRows] = useState<Record<number, true>>({});
 
+  // Total excludes items the user rejected (so rejected UNKNOWN rows drop out of the sum)
   const total = result
     ? Math.round(
-        result.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0) * 100
+        result.items.reduce((sum, item, idx) => {
+          if (item.sku === "UNKNOWN" && unknownDecisions[idx] === "rejected") return sum;
+          return sum + item.quantity * item.unitPrice;
+        }, 0) * 100
       ) / 100
     : 0;
 
@@ -93,11 +97,28 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   // Build summary sentence
   const insights = result.insights;
-  const unmatchedCount = result.items.filter((i) => i.sku === "UNKNOWN").length;
   // Count UNKNOWN items that haven't had a decision yet (button is gated on this)
   const pendingUnknownCount = result.items.reduce((acc, item, idx) => {
     return acc + (item.sku === "UNKNOWN" && !unknownDecisions[idx] ? 1 : 0);
   }, 0);
+  // Effective match stats — factor in user decisions on UNKNOWN rows.
+  // Accepted UNKNOWN → counts as matched. Rejected UNKNOWN → removed from total.
+  // While pending (no decision yet), UNKNOWN items count as unmatched.
+  const effectiveStats = result.items.reduce(
+    (acc, item, idx) => {
+      if (item.sku === "UNKNOWN") {
+        const decision = unknownDecisions[idx];
+        if (decision === "rejected") return acc; // removed entirely
+        if (decision === "accepted") return { matched: acc.matched + 1, total: acc.total + 1 };
+        return { matched: acc.matched, total: acc.total + 1 }; // pending → still unresolved
+      }
+      return { matched: acc.matched + 1, total: acc.total + 1 };
+    },
+    { matched: 0, total: 0 }
+  );
+  const effectiveMatchRate = effectiveStats.total > 0 ? effectiveStats.matched / effectiveStats.total : 1;
+  // For the amber "flagged" state, only show amber when there are STILL unresolved UNKNOWNs
+  const unmatchedCount = pendingUnknownCount;
   const summaryParts: string[] = [];
   summaryParts.push(`Parsed ${result.summary.totalItems} line items`);
   if (insights.typosFixed > 0) summaryParts.push(`corrected ${insights.typosFixed} typo${insights.typosFixed > 1 ? "s" : ""}`);
@@ -152,13 +173,9 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         <div>
           <h2 className="text-[13px] font-semibold text-p-text">Order Review</h2>
           <p className="text-[11px] text-p-text-secondary mt-0.5">
-            {(() => {
-              const matched = result.items.filter((i) => i.sku !== "UNKNOWN").length;
-              const total = result.summary.totalItems;
-              return matched < total
-                ? `${matched} of ${total} line items matched — review before sending to ERP`
-                : `${total} line items matched to catalog — review before sending to ERP`;
-            })()}
+            {effectiveStats.matched < effectiveStats.total
+              ? `${effectiveStats.matched} of ${effectiveStats.total} line items matched — review before sending to ERP`
+              : `${effectiveStats.total} line items matched to catalog — review before sending to ERP`}
           </p>
         </div>
         <button
@@ -188,10 +205,10 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-2.5 px-5 mb-4">
-        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up">
+      <div className="grid grid-cols-3 gap-2.5 px-5 mb-4 items-stretch">
+        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up flex flex-col justify-center">
           <div className="text-xl font-bold text-p-text tabular-nums">
-            {result.summary.totalItems}
+            {effectiveStats.total}
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <svg className="w-3 h-3 text-p-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,9 +219,9 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1">
           {(() => {
-            const matched = result.items.filter((i) => i.sku !== "UNKNOWN").length;
-            const total = result.summary.totalItems;
-            const pct = Math.round(result.summary.matchRate * 100);
+            const matched = effectiveStats.matched;
+            const total = effectiveStats.total;
+            const pct = Math.round(effectiveMatchRate * 100);
             const isPerfect = pct === 100;
             return (
               <>
@@ -233,7 +250,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             );
           })()}
         </div>
-        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2">
+        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2 flex flex-col justify-center">
           <div className="flex items-baseline gap-1.5">
             <div className="text-xl font-bold text-p-text tabular-nums">
               {result.summary.processingTimeMs < 1000
