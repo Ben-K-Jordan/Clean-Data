@@ -159,7 +159,10 @@ export default function DataInput({
         onDragLeave={handleDragLeave}
       >
         {uploadedImagePreview ? (
-          <div className="w-full h-full min-h-0 bg-p-surface border border-p-border rounded-polaris shadow-polaris-sm relative overflow-auto">
+          <div
+            className="w-full bg-p-surface border border-p-border rounded-polaris shadow-polaris-sm relative overflow-y-auto overflow-x-hidden"
+            style={{ maxHeight: "min(60vh, 600px)" }}
+          >
             <div className="relative p-4 flex justify-center">
               <img
                 src={uploadedImagePreview}
