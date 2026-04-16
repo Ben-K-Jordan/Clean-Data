@@ -206,7 +206,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
       {/* Summary stats */}
       <div className="grid grid-cols-3 gap-2.5 px-5 mb-4 items-stretch">
-        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up flex flex-col justify-center">
+        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up flex flex-col justify-between">
           <div className="text-xl font-bold text-p-text tabular-nums">
             {effectiveStats.total}
           </div>
@@ -217,7 +217,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             <span className="text-[11px] text-p-text-secondary">Line Items</span>
           </div>
         </div>
-        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1">
+        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1 flex flex-col justify-between">
           {(() => {
             const matched = effectiveStats.matched;
             const total = effectiveStats.total;
@@ -250,7 +250,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             );
           })()}
         </div>
-        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2 flex flex-col justify-center">
+        <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2 flex flex-col justify-between">
           <div className="flex items-baseline gap-1.5">
             <div className="text-xl font-bold text-p-text tabular-nums">
               {result.summary.processingTimeMs < 1000
