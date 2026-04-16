@@ -193,13 +193,23 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           <div className="text-xl font-bold text-p-text tabular-nums">
             {result.summary.totalItems}
           </div>
-          <div className="text-[11px] text-p-text-secondary">Line Items</div>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <svg className="w-3 h-3 text-p-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span className="text-[11px] text-p-text-secondary">Line Items</span>
+          </div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1">
           <div className="text-xl font-bold text-[#047b5d] tabular-nums">
             {Math.round(result.summary.matchRate * 100)}%
           </div>
-          <div className="text-[11px] text-p-text-secondary">Items Resolved</div>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <svg className="w-3 h-3 text-p-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-[11px] text-p-text-secondary">Items Resolved</span>
+          </div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2">
           <div className="flex items-baseline gap-1.5">
@@ -212,7 +222,12 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
               vs ~{manualTimeMin} min manual
             </span>
           </div>
-          <div className="text-[11px] text-p-text-secondary">Processing</div>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <svg className="w-3 h-3 text-p-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-[11px] text-p-text-secondary">Processing</span>
+          </div>
         </div>
       </div>
 
