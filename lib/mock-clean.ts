@@ -45,13 +45,20 @@ export function mockClean(rawData: string): CleanResult {
         abbreviationsResolved += abbrMatches.length;
       }
       // Check for likely typos by comparing words to product name
-      const origWords = orig.split(/[\s,/\-]+/).filter(w => w.length > 2);
-      const prodWords = item.product.toLowerCase().split(/[\s,/\-]+/).filter(w => w.length > 2);
+      const origWords = orig.split(/[\s,/\-]+/).filter(w => w.length > 3);
+      const prodWords = item.product.toLowerCase().split(/[\s,/\-]+/).filter(w => w.length > 3);
       for (const ow of origWords) {
         if (/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|hvy|ltwt)\b/i.test(ow)) continue; // skip standard abbreviations
+        // Skip if the word appears exactly in any product word (not a typo)
+        if (prodWords.some((pw) => pw === ow)) continue;
+        // Skip simple plural/singular variations (tee vs tees, sock vs socks)
+        if (prodWords.some((pw) => pw + "s" === ow || ow + "s" === pw)) continue;
+        // Skip if it's a prefix/contained word
+        if (prodWords.some((pw) => pw.startsWith(ow) || ow.startsWith(pw))) continue;
         for (const pw of prodWords) {
           const dist = editDistance(ow, pw);
-          if (dist > 0 && dist <= 3 && dist < pw.length * 0.5) {
+          // Stricter: dist 1-2 only, and must be meaningful relative to word length
+          if (dist >= 1 && dist <= 2 && dist < Math.max(pw.length, ow.length) * 0.4) {
             typosFixed++;
             break;
           }
