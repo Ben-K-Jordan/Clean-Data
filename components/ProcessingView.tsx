@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const steps = [
   {
     label: "Scanning document",
-    detail: "Reading and analyzing input data...",
+    detail: "Reading and analyzing order data...",
     icon: (
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -24,7 +24,7 @@ const steps = [
   },
   {
     label: "Matching catalog",
-    detail: "Finding best SKU matches...",
+    detail: "Mapping to product catalog SKUs...",
     icon: (
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -32,8 +32,8 @@ const steps = [
     ),
   },
   {
-    label: "Structuring output",
-    detail: "Building clean line items...",
+    label: "Ready for review",
+    detail: "Preparing structured order for approval...",
     icon: (
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -56,11 +56,10 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
     return () => clearInterval(interval);
   }, [startTime]);
 
-  const activeStep = Math.min(Math.floor(elapsed / 350), steps.length - 1);
+  const activeStep = Math.min(Math.floor(elapsed / 400), steps.length - 1);
 
   return (
     <div className="flex flex-col items-center justify-center h-full py-12">
-      {/* Shopify-style spinner */}
       <div className="relative w-12 h-12 mb-8">
         <div className="absolute inset-0 border-[3px] border-p-border rounded-full" />
         <div className="absolute inset-0 border-[3px] border-transparent border-t-[#008060] rounded-full animate-spin" />

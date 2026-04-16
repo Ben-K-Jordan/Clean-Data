@@ -6,118 +6,176 @@ export interface CatalogItem {
   aliases: string[];
 }
 
+// Product catalog for a clothing manufacturer
+// Prices are wholesale/manufacturing cost per unit
 export const catalog: CatalogItem[] = [
   {
-    sku: "SKU-1001",
-    name: "Classic Crew Neck T-Shirt - Black / M",
-    unitPrice: 24.99,
+    sku: "TEE-BLK-M",
+    name: "Essential Crew Tee - Black / M",
+    unitPrice: 8.50,
     unit: "EA",
-    aliases: ["crew neck tee", "black tshirt", "classic tee black medium", "crew neck t-shirt"],
+    aliases: ["crew neck tee black", "black tshirt medium", "essential tee black", "crew tee blk m", "black crew neck"],
   },
   {
-    sku: "SKU-1002",
-    name: "Classic Crew Neck T-Shirt - White / M",
-    unitPrice: 24.99,
+    sku: "TEE-BLK-L",
+    name: "Essential Crew Tee - Black / L",
+    unitPrice: 8.50,
     unit: "EA",
-    aliases: ["white tshirt", "classic tee white", "crew neck white medium", "white t-shirt"],
+    aliases: ["crew neck tee black large", "black tshirt large", "essential tee black l", "crew tee blk l"],
   },
   {
-    sku: "SKU-1003",
-    name: "Classic Crew Neck T-Shirt - Navy / L",
-    unitPrice: 24.99,
+    sku: "TEE-WHT-M",
+    name: "Essential Crew Tee - White / M",
+    unitPrice: 8.50,
     unit: "EA",
-    aliases: ["navy tshirt", "navy tee large", "crew neck navy"],
+    aliases: ["white tshirt", "essential tee white", "crew tee white medium", "white crew neck", "white t-shirt"],
   },
   {
-    sku: "SKU-2001",
-    name: "Slim Fit Denim Jeans - Dark Wash / 32",
-    unitPrice: 89.99,
+    sku: "TEE-WHT-L",
+    name: "Essential Crew Tee - White / L",
+    unitPrice: 8.50,
     unit: "EA",
-    aliases: ["slim jeans", "dark wash jeans", "denim jeans dark", "slim fit denim 32"],
+    aliases: ["white tshirt large", "essential tee white l", "crew tee white large"],
   },
   {
-    sku: "SKU-2002",
-    name: "Slim Fit Denim Jeans - Light Wash / 34",
-    unitPrice: 89.99,
+    sku: "TEE-NVY-M",
+    name: "Essential Crew Tee - Navy / M",
+    unitPrice: 8.50,
     unit: "EA",
-    aliases: ["light wash jeans", "light denim", "slim jeans light 34"],
+    aliases: ["navy tshirt", "navy tee medium", "crew neck navy", "essential tee navy"],
   },
   {
-    sku: "SKU-3001",
-    name: "Wireless Bluetooth Earbuds - Matte Black",
-    unitPrice: 79.99,
+    sku: "HOOD-BLK-M",
+    name: "Heavyweight Pullover Hoodie - Black / M",
+    unitPrice: 22.00,
     unit: "EA",
-    aliases: ["bluetooth earbuds", "wireless earbuds", "earbuds black", "bt earbuds"],
+    aliases: ["hoodie black medium", "pullover hoodie blk", "heavyweight hoodie black", "black hoodie m"],
   },
   {
-    sku: "SKU-3002",
-    name: "USB-C Fast Charging Cable - 6ft",
-    unitPrice: 14.99,
+    sku: "HOOD-BLK-L",
+    name: "Heavyweight Pullover Hoodie - Black / L",
+    unitPrice: 22.00,
     unit: "EA",
-    aliases: ["usb c cable", "charging cable", "usb-c charger", "fast charge cable", "type c cable"],
+    aliases: ["hoodie black large", "pullover hoodie blk l", "heavyweight hoodie black l", "black hoodie l"],
   },
   {
-    sku: "SKU-3003",
-    name: "Laptop Sleeve - 14\" Neoprene Grey",
-    unitPrice: 34.99,
+    sku: "HOOD-GRY-M",
+    name: "Heavyweight Pullover Hoodie - Heather Grey / M",
+    unitPrice: 22.00,
     unit: "EA",
-    aliases: ["laptop sleeve", "laptop case", "14 inch sleeve", "neoprene sleeve", "laptop bag"],
+    aliases: ["grey hoodie", "heather grey hoodie", "gray hoodie medium", "pullover grey m"],
   },
   {
-    sku: "SKU-4001",
-    name: "Organic Face Moisturizer - 2oz",
-    unitPrice: 28.99,
+    sku: "CREW-BLK-M",
+    name: "Midweight Crewneck Sweatshirt - Black / M",
+    unitPrice: 18.75,
     unit: "EA",
-    aliases: ["face moisturizer", "organic moisturizer", "face cream", "moisturizer 2oz"],
+    aliases: ["crewneck sweatshirt black", "black crewneck", "midweight crew black", "sweatshirt blk m"],
   },
   {
-    sku: "SKU-4002",
-    name: "Vitamin C Brightening Serum - 1oz",
-    unitPrice: 42.99,
+    sku: "CREW-NVY-L",
+    name: "Midweight Crewneck Sweatshirt - Navy / L",
+    unitPrice: 18.75,
     unit: "EA",
-    aliases: ["vitamin c serum", "brightening serum", "face serum", "vit c serum"],
+    aliases: ["crewneck sweatshirt navy", "navy crewneck", "midweight crew navy", "sweatshirt nvy l"],
   },
   {
-    sku: "SKU-5001",
-    name: "Stainless Steel Water Bottle - 24oz",
-    unitPrice: 32.99,
+    sku: "JGR-BLK-M",
+    name: "Slim Fit Jogger - Black / M",
+    unitPrice: 16.25,
     unit: "EA",
-    aliases: ["water bottle", "steel bottle", "stainless bottle", "24oz bottle", "metal water bottle"],
+    aliases: ["jogger black", "black joggers", "slim jogger blk", "jogger pants black medium"],
   },
   {
-    sku: "SKU-5002",
-    name: "Insulated Travel Mug - 16oz Black",
-    unitPrice: 27.99,
+    sku: "JGR-BLK-L",
+    name: "Slim Fit Jogger - Black / L",
+    unitPrice: 16.25,
     unit: "EA",
-    aliases: ["travel mug", "insulated mug", "coffee mug", "thermos mug", "travel coffee mug"],
+    aliases: ["jogger black large", "black joggers l", "slim jogger blk l"],
   },
   {
-    sku: "SKU-6001",
-    name: "Canvas Tote Bag - Natural",
-    unitPrice: 18.99,
+    sku: "JGR-GRY-M",
+    name: "Slim Fit Jogger - Heather Grey / M",
+    unitPrice: 16.25,
     unit: "EA",
-    aliases: ["tote bag", "canvas tote", "shopping bag", "canvas bag natural"],
+    aliases: ["grey jogger", "heather grey jogger", "gray joggers medium", "jogger pants grey"],
   },
   {
-    sku: "SKU-6002",
-    name: "Recycled Polyester Backpack - Charcoal",
-    unitPrice: 64.99,
+    sku: "DNM-IND-32",
+    name: 'Straight Leg Denim - Indigo / 32"',
+    unitPrice: 24.00,
     unit: "EA",
-    aliases: ["backpack", "polyester backpack", "charcoal backpack", "recycled backpack"],
+    aliases: ["denim indigo", "indigo jeans 32", "straight leg jeans", "denim pants indigo", "jeans indigo 32"],
   },
   {
-    sku: "SKU-7001",
-    name: "Soy Wax Candle - Lavender / 8oz",
-    unitPrice: 22.99,
+    sku: "DNM-BLK-32",
+    name: 'Straight Leg Denim - Black / 32"',
+    unitPrice: 24.00,
     unit: "EA",
-    aliases: ["soy candle", "lavender candle", "candle 8oz", "wax candle lavender"],
+    aliases: ["black denim", "black jeans 32", "straight leg black", "denim pants black 32"],
   },
   {
-    sku: "SKU-7002",
-    name: "Essential Oil Diffuser - Ceramic White",
-    unitPrice: 44.99,
+    sku: "SHT-KHK-M",
+    name: "Chino Short - Khaki / M",
+    unitPrice: 14.50,
     unit: "EA",
-    aliases: ["oil diffuser", "essential oil diffuser", "ceramic diffuser", "aroma diffuser"],
+    aliases: ["chino shorts khaki", "khaki shorts", "chino short medium", "shorts khaki m"],
+  },
+  {
+    sku: "SHT-NVY-M",
+    name: "Chino Short - Navy / M",
+    unitPrice: 14.50,
+    unit: "EA",
+    aliases: ["chino shorts navy", "navy shorts", "chino short navy medium"],
+  },
+  {
+    sku: "JKT-BLK-M",
+    name: "Lightweight Bomber Jacket - Black / M",
+    unitPrice: 34.00,
+    unit: "EA",
+    aliases: ["bomber jacket black", "black bomber", "lightweight jacket blk", "bomber blk m"],
+  },
+  {
+    sku: "JKT-OLV-L",
+    name: "Lightweight Bomber Jacket - Olive / L",
+    unitPrice: 34.00,
+    unit: "EA",
+    aliases: ["bomber jacket olive", "olive bomber", "green bomber jacket", "bomber olv l"],
+  },
+  {
+    sku: "CAP-BLK",
+    name: "Structured 6-Panel Cap - Black",
+    unitPrice: 6.75,
+    unit: "EA",
+    aliases: ["cap black", "black cap", "6 panel cap", "structured cap blk", "hat black"],
+  },
+  {
+    sku: "CAP-NVY",
+    name: "Structured 6-Panel Cap - Navy",
+    unitPrice: 6.75,
+    unit: "EA",
+    aliases: ["cap navy", "navy cap", "6 panel cap navy", "structured cap navy", "hat navy"],
+  },
+  {
+    sku: "SCK-BLK-OS",
+    name: "Athletic Crew Sock - Black / One Size",
+    unitPrice: 3.25,
+    unit: "PR",
+    aliases: ["crew sock black", "black socks", "athletic socks blk", "socks black"],
+  },
+  {
+    sku: "SCK-WHT-OS",
+    name: "Athletic Crew Sock - White / One Size",
+    unitPrice: 3.25,
+    unit: "PR",
+    aliases: ["crew sock white", "white socks", "athletic socks wht", "socks white"],
+  },
+  {
+    sku: "BNE-BLK-OS",
+    name: "Knit Beanie - Black / One Size",
+    unitPrice: 5.50,
+    unit: "EA",
+    aliases: ["beanie black", "black beanie", "knit beanie blk", "winter beanie black"],
   },
 ];
 
@@ -162,17 +220,13 @@ function computeMatchScore(query: string, target: string): number {
 
   let score = 0;
   for (const tw of targetWords) {
-    // Exact word match
     if (queryWords.some((qw) => qw === tw)) {
       score += 3;
-    }
-    // Fuzzy match (one word contains the other)
-    else if (queryWords.some((qw) => qw.includes(tw) || tw.includes(qw))) {
+    } else if (queryWords.some((qw) => qw.includes(tw) || tw.includes(qw))) {
       score += 1;
     }
   }
 
-  // Bonus for matching a high proportion of target words
   const matchedCount = targetWords.filter((tw) =>
     queryWords.some((qw) => qw === tw || qw.includes(tw) || tw.includes(qw))
   ).length;

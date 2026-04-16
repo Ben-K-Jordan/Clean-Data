@@ -61,10 +61,10 @@ export default function Home() {
           <div className="mb-4 flex items-end justify-between">
             <div>
               <h1 className="text-lg font-bold text-p-text tracking-tight">
-                Clean Data
+                Order Processing
               </h1>
               <p className="text-[13px] text-p-text-secondary mt-0.5">
-                Transform unstructured product data into catalog-ready line items
+                Automatically parse incoming orders and match to your product catalog
               </p>
             </div>
             <div className="flex items-center gap-1.5 text-[11px] text-p-text-secondary">
