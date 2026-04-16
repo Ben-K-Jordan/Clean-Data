@@ -96,13 +96,6 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           >
             Clear
           </button>
-          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-            result.mode === "ai"
-              ? "bg-purple-50 text-purple-600 border border-purple-200"
-              : "bg-gray-100 text-p-text-secondary border border-p-border"
-          }`}>
-            {result.mode === "ai" ? "AI" : "Mock"}
-          </span>
         </div>
       </div>
 

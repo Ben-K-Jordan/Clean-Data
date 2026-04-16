@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { cleanData } from "@/lib/clean";
-import { CleanRequest } from "@/lib/types";
 
 export async function POST(request: Request) {
   try {
-    const body: CleanRequest = await request.json();
+    const body = await request.json();
 
     if (!body.rawData || typeof body.rawData !== "string") {
       return NextResponse.json(
@@ -13,10 +12,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await cleanData({
-      rawData: body.rawData,
-      mode: body.mode || "mock",
-    });
+    const result = await cleanData({ rawData: body.rawData });
 
     return NextResponse.json(result);
   } catch (error) {

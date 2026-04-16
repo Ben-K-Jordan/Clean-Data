@@ -82,7 +82,6 @@ Rules:
       matchRate: items.length > 0 ? matched.length / items.length : 0,
       processingTimeMs: Math.round(elapsed),
     },
-    mode: "ai",
   };
 }
 

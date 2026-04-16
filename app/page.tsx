@@ -9,7 +9,6 @@ import { CleanResult } from "@/lib/types";
 
 export default function Home() {
   const [rawData, setRawData] = useState("");
-  const [mode, setMode] = useState<"mock" | "ai">("mock");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<CleanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +24,7 @@ export default function Home() {
       const res = await fetch("/api/clean", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawData, mode }),
+        body: JSON.stringify({ rawData }),
       });
 
       const data = await res.json();
@@ -34,9 +33,10 @@ export default function Home() {
         throw new Error(data.error || "Failed to clean data");
       }
 
+      // Ensure minimum processing time for believable UX
       const elapsed = Date.now() - startTimeRef.current;
-      if (elapsed < 1500 && mode === "mock") {
-        await new Promise((r) => setTimeout(r, 1500 - elapsed));
+      if (elapsed < 1800) {
+        await new Promise((r) => setTimeout(r, 1800 - elapsed));
       }
 
       setResult(data);
@@ -82,14 +82,12 @@ export default function Home() {
               <DataInput
                 value={rawData}
                 onChange={setRawData}
-                mode={mode}
-                onModeChange={setMode}
                 onSubmit={handleClean}
                 isLoading={isLoading}
               />
             </div>
 
-            {/* Right panel: Output — slightly wider */}
+            {/* Right panel: Output */}
             <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris overflow-hidden">
               {isLoading ? (
                 <ProcessingView startTime={startTimeRef.current} />

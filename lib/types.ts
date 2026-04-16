@@ -14,10 +14,8 @@ export interface CleanResult {
     matchRate: number;
     processingTimeMs: number;
   };
-  mode: "mock" | "ai";
 }
 
 export interface CleanRequest {
   rawData: string;
-  mode: "mock" | "ai";
 }
