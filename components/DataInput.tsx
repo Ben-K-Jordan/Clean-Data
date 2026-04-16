@@ -11,6 +11,7 @@ interface DataInputProps {
   isLoading: boolean;
   uploadedImagePreview?: string | null;
   isScanning?: boolean;
+  hasResult?: boolean;
 }
 
 export default function DataInput({
@@ -21,6 +22,7 @@ export default function DataInput({
   isLoading,
   uploadedImagePreview,
   isScanning,
+  hasResult,
 }: DataInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -122,7 +124,13 @@ export default function DataInput({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span className="text-[12px] text-[#047b5d] font-medium flex-1 truncate">{uploadedFile}</span>
-          <span className="text-[10px] text-[#047b5d]/70 font-medium px-1.5 py-0.5 rounded bg-green-100">Scanned</span>
+          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+            isScanning
+              ? "text-blue-600/70 bg-blue-50"
+              : hasResult
+              ? "text-[#047b5d]/70 bg-green-100"
+              : "text-p-text-secondary bg-p-surface-secondary"
+          }`}>{isScanning ? "Scanning..." : hasResult ? "Scanned" : "Uploaded"}</span>
           <button onClick={clearFile} className="text-[#047b5d]/60 hover:text-[#047b5d] transition-colors">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -146,28 +154,16 @@ export default function DataInput({
                 alt="Uploaded order"
                 className="max-h-full max-w-full object-contain rounded-polaris border border-p-border-secondary shadow-polaris-sm"
               />
-              {/* Scanning overlay */}
+              {/* Scanning overlay — blue transparent bar sweeping down then up */}
               {isScanning && (
                 <div className="absolute inset-0 rounded-polaris overflow-hidden pointer-events-none">
-                  {/* Dark tint overlay */}
-                  <div className="absolute inset-0 bg-black/10 animate-scan-pulse" />
-                  {/* Scanning line */}
-                  <div className="absolute left-0 right-0 h-[3px] animate-scan-line" style={{ boxShadow: '0 0 15px 5px rgba(48, 48, 48, 0.4)' }}>
-                    <div className="w-full h-full bg-gradient-to-r from-transparent via-[#303030] to-transparent" />
-                    {/* Glow below the line */}
-                    <div className="w-full h-8 bg-gradient-to-b from-[#303030]/20 to-transparent" />
-                  </div>
-                  {/* Corner brackets */}
-                  <div className="absolute top-2 left-2 w-5 h-5 border-t-2 border-l-2 border-[#303030] animate-scan-corner" />
-                  <div className="absolute top-2 right-2 w-5 h-5 border-t-2 border-r-2 border-[#303030] animate-scan-corner" style={{ animationDelay: '0.25s' }} />
-                  <div className="absolute bottom-2 left-2 w-5 h-5 border-b-2 border-l-2 border-[#303030] animate-scan-corner" style={{ animationDelay: '0.5s' }} />
-                  <div className="absolute bottom-2 right-2 w-5 h-5 border-b-2 border-r-2 border-[#303030] animate-scan-corner" style={{ animationDelay: '0.75s' }} />
+                  <div className="absolute left-0 right-0 h-[60px] animate-scan-sweep bg-gradient-to-b from-blue-500/0 via-blue-500/25 to-blue-500/0" />
                 </div>
               )}
             </div>
             <p className="text-[11px] text-p-text-secondary">
               {isScanning ? (
-                <span className="flex items-center gap-1.5 text-p-text font-medium">
+                <span className="flex items-center gap-1.5 text-blue-600 font-medium">
                   <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />

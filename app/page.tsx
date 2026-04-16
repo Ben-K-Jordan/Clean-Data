@@ -204,6 +204,7 @@ export default function Home() {
                 isLoading={isLoading || isDemo || isScanning}
                 uploadedImagePreview={imagePreview}
                 isScanning={isScanning}
+                hasResult={!!result}
               />
             </div>
 
