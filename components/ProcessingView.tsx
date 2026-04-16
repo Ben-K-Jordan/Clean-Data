@@ -62,7 +62,7 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
     <div className="flex flex-col items-center justify-center h-full py-12">
       <div className="relative w-12 h-12 mb-8">
         <div className="absolute inset-0 border-[3px] border-p-border rounded-full" />
-        <div className="absolute inset-0 border-[3px] border-transparent border-t-[#008060] rounded-full animate-spin" />
+        <div className="absolute inset-0 border-[3px] border-transparent border-t-p-fill-brand rounded-full animate-spin" />
       </div>
 
       <div className="space-y-2 w-full max-w-sm">
@@ -85,7 +85,7 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
                   done
                     ? "bg-[#cdfee1] text-[#047b5d]"
                     : active
-                    ? "bg-[#008060] text-white"
+                    ? "bg-p-fill-brand text-white"
                     : "bg-p-surface-secondary text-p-text-secondary"
                 }`}
               >

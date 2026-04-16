@@ -6,7 +6,7 @@ import DataInput from "@/components/DataInput";
 import ProcessingView from "@/components/ProcessingView";
 import CleanedOutput from "@/components/CleanedOutput";
 import { CleanResult } from "@/lib/types";
-import { sampleEmail, samplePO, sampleCSV } from "@/lib/samples";
+import { sampleEmail, samplePO, sampleCSV, sampleEdgeCase } from "@/lib/samples";
 
 export default function Home() {
   const [rawData, setRawData] = useState("");
@@ -97,14 +97,9 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto px-5 py-5 h-full flex flex-col">
           {/* Page header */}
           <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h1 className="text-lg font-bold text-p-text tracking-tight">
-                Order Processing
-              </h1>
-              <p className="text-[13px] text-p-text-secondary mt-0.5">
-                Automatically parse incoming orders and match to your product catalog
-              </p>
-            </div>
+            <h1 className="text-lg font-bold text-p-text tracking-tight">
+              Structured Orders
+            </h1>
             {!result && !isLoading && !isDemo && (
               <div className="relative">
                 <button
@@ -149,6 +144,19 @@ export default function Home() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                         Messy CSV
+                      </button>
+                      <div className="mx-2 my-1 border-t border-p-border-secondary" />
+                      <button
+                        onClick={() => runDemo(sampleEdgeCase)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-[13px] hover:bg-red-50 transition-colors group"
+                      >
+                        <div className="w-5 h-5 rounded-full bg-red-100 group-hover:bg-red-200 flex items-center justify-center shrink-0 transition-colors">
+                          <span className="text-sm leading-none">💣</span>
+                        </div>
+                        <div>
+                          <div className="font-semibold text-red-700 text-[12px]">Edge Case</div>
+                          <div className="text-[10px] text-red-500/80 leading-tight">Forwarded texts, typos, slang</div>
+                        </div>
                       </button>
                     </div>
                   </>

@@ -13,10 +13,9 @@ export function mockClean(rawData: string): CleanResult {
   for (const line of lines) {
     if (isNonDataLine(line)) continue;
 
-    // Handle multi-item lines ("75 canvas tote bags and 30 soy candles")
     const segments = splitMultiItem(line);
     for (const seg of segments) {
-      const extracted = extractLineItem(seg);
+      const extracted = extractLineItem(seg, line);
       if (extracted) {
         items.push(extracted);
       }
@@ -26,12 +25,54 @@ export function mockClean(rawData: string): CleanResult {
   const matched = items.filter((i) => i.confidence > 0);
   const elapsed = performance.now() - start;
 
+  // Compute insights
+  let typosFixed = 0;
+  let abbreviationsResolved = 0;
+  let skusDirect = 0;
+  let fuzzyMatches = 0;
+
+  for (const item of items) {
+    if (item.confidence <= 0) continue;
+    const orig = item.originalText.toLowerCase();
+    const hasSku = /[A-Z]{2,}-[A-Z]{2,}/i.test(orig);
+
+    if (hasSku) {
+      skusDirect++;
+    } else {
+      // Check for abbreviations (blk, wht, nvy, gry, med, lrg, etc.)
+      if (/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|tee|hvy|ltwt)\b/i.test(orig)) {
+        abbreviationsResolved++;
+      }
+      // Check for likely typos by comparing words to product name
+      const origWords = orig.split(/[\s,/\-]+/).filter(w => w.length > 2);
+      const prodWords = item.product.toLowerCase().split(/[\s,/\-]+/).filter(w => w.length > 2);
+      for (const ow of origWords) {
+        for (const pw of prodWords) {
+          const dist = editDistance(ow, pw);
+          if (dist > 0 && dist <= 2 && dist < pw.length * 0.4) {
+            typosFixed++;
+            break;
+          }
+        }
+      }
+      if (!hasSku && item.confidence < 0.95) {
+        fuzzyMatches++;
+      }
+    }
+  }
+
   return {
     items,
     summary: {
       totalItems: items.length,
       matchRate: items.length > 0 ? matched.length / items.length : 0,
       processingTimeMs: Math.round(elapsed),
+    },
+    insights: {
+      typosFixed: Math.min(typosFixed, items.length), // cap at reasonable number
+      abbreviationsResolved,
+      skusDirect,
+      fuzzyMatches,
     },
   };
 }
@@ -59,17 +100,26 @@ function isNonDataLine(line: string): boolean {
     /^\$[\d,.]+$/,
     // Separator lines
     /^[|\-=\s]+$/,
+    // Forwarded message headers
+    /^-*\s*forward/,
+    /^-*\s*from\s+\w+'?s?\s+(email|text|imessage|message)/,
+    // Section labels without quantities
+    /^(hoodies?|joggers?|sweatshirts?|outerwear|accessories|denim|shorts?|misc)\b.*[:!]/i,
+    /^\^+\s/,
+    // Short conversational fragments (only if no numbers — they might contain qty)
+    /^(yo\s|ok\s|k\s|lol|wait\s|um+\s)[^0-9]*$/,
   ];
   return skipPatterns.some((p) => p.test(lower));
 }
 
 function splitMultiItem(line: string): string[] {
   const cleaned = line
-    .replace(/^[-•*]\s*/, "")
-    .replace(/^also\s+need\s+/i, "")
-    .replace(/^need\s+/i, "");
+    .replace(/^[-•*►→▸]\s*/, "")
+    .replace(/^(?:also|oh\s+and|and\s+also|plus)\s+(?:need\s+)?/i, "")
+    .replace(/^(?:need|throw\s+in|add)\s+/i, "");
 
-  const parts = cleaned.split(/\s+and\s+/i);
+  // Split on " and ", " + ", " & " between items that both have numbers
+  const parts = cleaned.split(/\s+(?:and|&|\+)\s+/i);
   if (parts.length > 1 && parts.every((p) => /\d/.test(p))) {
     return parts;
   }
@@ -82,9 +132,24 @@ function parseQty(raw: string): number | null {
   return n;
 }
 
-function extractLineItem(line: string): LineItem | null {
-  const cleaned = line.replace(/^[-•*]\s*/, "").trim();
+function extractLineItem(line: string, rawLine?: string): LineItem | null {
+  const originalLine = rawLine || line;
+  let cleaned = line.replace(/^[-•*►→▸]\s*/, "").trim();
   if (!cleaned || cleaned.length < 3) return null;
+
+  // Pre-clean: strip leading conversational junk
+  cleaned = cleaned
+    .replace(/^(?:oh\s+and\s+)?(?:jake|sarah|marcus|devon|he|she|they)\s+(?:said|says|wants?|asked|mentioned)\s+(?:to\s+)?(?:add|throw\s+in|include|get)?\s*/i, "")
+    .replace(/^(?:oh\s+and|and\s+also|also|plus)\s+(?:throw\s+in|add|get|need)?\s*/i, "")
+    .replace(/^(?:throw\s+in|add|need|get)\s+/i, "")
+    .trim();
+
+  // Pre-clean: strip trailing junk words/punctuation
+  cleaned = cleaned
+    .replace(/\s*[!?]+\s*$/, "")
+    .replace(/\s+(?:pls|plz|please|asap|urgent|lol|lmk|smh|tbh|ngl|ty|thx|tho|thnx|idk|fyi|btw|imo|rn)\s*$/i, "")
+    .replace(/\s*\((?:the\s+)?(?:essential|heavyweight|lightweight|midweight|slim|structured)?\s*(?:ones?|style|type|kind|version)\)\s*$/i, "")
+    .trim();
 
   // 1. SKU pattern first — "SKU-XXXX | qty" or "qty units of SKU-XXXX"
   const skuWithQtyAfter = cleaned.match(
@@ -92,7 +157,7 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (skuWithQtyAfter) {
     const qty = parseQty(skuWithQtyAfter[2]);
-    if (qty) return matchToCatalog(skuWithQtyAfter[1], qty, "EA", undefined);
+    if (qty) return matchToCatalog(skuWithQtyAfter[1], qty, "EA", undefined, originalLine);
   }
 
   const skuWithQtyBefore = cleaned.match(
@@ -100,7 +165,7 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (skuWithQtyBefore) {
     const qty = parseQty(skuWithQtyBefore[1]);
-    if (qty) return matchToCatalog(skuWithQtyBefore[2], qty, "EA", undefined);
+    if (qty) return matchToCatalog(skuWithQtyBefore[2], qty, "EA", undefined, originalLine);
   }
 
   // 2. Tabular: "Product Name | SKU-XXXX | qty | unit | $price"
@@ -109,7 +174,7 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (tableMatch) {
     const qty = parseQty(tableMatch[3]);
-    if (qty) return matchToCatalog(tableMatch[1].trim(), qty, tableMatch[4], parseFloat(tableMatch[5]));
+    if (qty) return matchToCatalog(tableMatch[1].trim(), qty, tableMatch[4], parseFloat(tableMatch[5]), originalLine);
   }
 
   // 3. "product ... need about QTY of those"
@@ -118,7 +183,7 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (needAboutMatch) {
     const qty = parseQty(needAboutMatch[2]);
-    if (qty) return matchToCatalog(needAboutMatch[1].trim(), qty, "EA", undefined);
+    if (qty) return matchToCatalog(needAboutMatch[1].trim(), qty, "EA", undefined, originalLine);
   }
 
   // 4. Strict CSV: product,qty,$price
@@ -127,7 +192,7 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (strictCsvMatch) {
     const qty = parseQty(strictCsvMatch[2]);
-    if (qty) return matchToCatalog(strictCsvMatch[1].trim(), qty, "EA", parseFloat(strictCsvMatch[3]));
+    if (qty) return matchToCatalog(strictCsvMatch[1].trim(), qty, "EA", parseFloat(strictCsvMatch[3]), originalLine);
   }
 
   // 5. Pipe/tab separated: "product | qty | unit | $price"
@@ -141,7 +206,7 @@ function extractLineItem(line: string): LineItem | null {
       const priceMatch = cleaned.match(/\$?([\d]+\.[\d]{2})\s*$/);
       return matchToCatalog(
         pipeSepMatch[1].trim(), qty, pipeSepMatch[3] || "EA",
-        priceMatch ? parseFloat(priceMatch[1]) : undefined
+        priceMatch ? parseFloat(priceMatch[1]) : undefined, originalLine
       );
     }
   }
@@ -152,7 +217,7 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (unitsOfMatch && unitsOfMatch[2].trim().length > 2) {
     const qty = parseQty(unitsOfMatch[1]);
-    if (qty) return matchToCatalog(unitsOfMatch[2].trim(), qty, "EA", undefined);
+    if (qty) return matchToCatalog(unitsOfMatch[2].trim(), qty, "EA", undefined, originalLine);
   }
 
   // 7. "QTYx PRODUCT"
@@ -161,20 +226,32 @@ function extractLineItem(line: string): LineItem | null {
   );
   if (qtyXMatch && qtyXMatch[2].trim().length > 2) {
     const qty = parseQty(qtyXMatch[1]);
-    if (qty) return matchToCatalog(qtyXMatch[2].trim(), qty, "EA", qtyXMatch[3] ? parseFloat(qtyXMatch[3]) : undefined);
+    if (qty) return matchToCatalog(qtyXMatch[2].trim(), qty, "EA", qtyXMatch[3] ? parseFloat(qtyXMatch[3]) : undefined, originalLine);
   }
 
-  // 8. "QTY PRODUCT" (generic — must be last)
+  // 8. "PRODUCT - QTY" or "PRODUCT: QTY" (product first, qty after separator)
+  const productThenQty = cleaned.match(
+    /^(.+?)\s*[-–:]\s*(\d+)\s*(?:units?|pcs|pairs?|ea)?$/i
+  );
+  if (productThenQty && productThenQty[1].trim().length > 2) {
+    const desc = productThenQty[1].trim();
+    if (!/^\d+$/.test(desc)) {
+      const qty = parseQty(productThenQty[2]);
+      if (qty) return matchToCatalog(desc, qty, "EA", undefined, originalLine);
+    }
+  }
+
+  // 9. "QTY PRODUCT" (generic — must be last)
   const qtyProductMatch = cleaned.match(
     /^(\d+)\s+(.+?)(?:\s*[@$]\s*([\d.]+))?$/i
   );
   if (qtyProductMatch && qtyProductMatch[2].trim().length > 2) {
     const desc = qtyProductMatch[2]
-      .replace(/^(?:packs?|boxes?)\s+(?:of\s+)?/i, "")
+      .replace(/^(?:packs?|boxes?|more|extra|additional)\s+(?:of\s+)?/i, "")
       .trim();
     if (!/^\$?[\d.,]+$/.test(desc) && !/^(ea|each|pcs|units?)$/i.test(desc)) {
       const qty = parseQty(qtyProductMatch[1]);
-      if (qty) return matchToCatalog(desc, qty, "EA", qtyProductMatch[3] ? parseFloat(qtyProductMatch[3]) : undefined);
+      if (qty) return matchToCatalog(desc, qty, "EA", qtyProductMatch[3] ? parseFloat(qtyProductMatch[3]) : undefined, originalLine);
     }
   }
 
@@ -268,7 +345,8 @@ function matchToCatalog(
   query: string,
   qty: number,
   unit: string,
-  price?: number
+  price?: number,
+  originalText?: string
 ): LineItem {
   const match = findBestMatch(query);
 
@@ -282,6 +360,7 @@ function matchToCatalog(
       unit: match.unit,
       unitPrice: price ?? match.unitPrice,
       confidence,
+      originalText: originalText || query,
     };
   }
 
@@ -292,5 +371,6 @@ function matchToCatalog(
     unit: unit.toUpperCase(),
     unitPrice: price ?? 0,
     confidence: 0,
+    originalText: originalText || query,
   };
 }

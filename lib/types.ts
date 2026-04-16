@@ -5,6 +5,7 @@ export interface LineItem {
   unit: string;
   unitPrice: number;
   confidence: number;
+  originalText: string;
 }
 
 export interface CleanResult {
@@ -13,6 +14,12 @@ export interface CleanResult {
     totalItems: number;
     matchRate: number;
     processingTimeMs: number;
+  };
+  insights: {
+    typosFixed: number;
+    abbreviationsResolved: number;
+    skusDirect: number;
+    fuzzyMatches: number;
   };
 }
 

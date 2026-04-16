@@ -82,6 +82,12 @@ Rules:
       matchRate: items.length > 0 ? matched.length / items.length : 0,
       processingTimeMs: Math.round(elapsed),
     },
+    insights: {
+      typosFixed: 0,
+      abbreviationsResolved: 0,
+      skusDirect: 0,
+      fuzzyMatches: 0,
+    },
   };
 }
 
@@ -99,5 +105,6 @@ function validateItems(raw: unknown): LineItem[] {
       unit: typeof item.unit === "string" ? item.unit : "EA",
       unitPrice: typeof item.unitPrice === "number" ? item.unitPrice : 0,
       confidence: typeof item.confidence === "number" ? item.confidence : 0,
+      originalText: typeof item.product === "string" ? item.product : "Unknown",
     }));
 }

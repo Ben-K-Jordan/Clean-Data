@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CleanResult } from "@/lib/types";
 
 interface CleanedOutputProps {
@@ -11,6 +11,38 @@ interface CleanedOutputProps {
 export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   const [copied, setCopied] = useState(false);
   const [approved, setApproved] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [animatedTotal, setAnimatedTotal] = useState(0);
+
+  const total = result
+    ? Math.round(
+        result.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0) * 100
+      ) / 100
+    : 0;
+
+  // Animate total counting up
+  useEffect(() => {
+    if (!result || total === 0) {
+      setAnimatedTotal(0);
+      return;
+    }
+    const duration = 1200;
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setAnimatedTotal(total * eased);
+      if (progress >= 1) clearInterval(interval);
+    }, 16);
+    return () => clearInterval(interval);
+  }, [result, total]);
+
+  // Reset approved state when result changes
+  useEffect(() => {
+    setApproved(false);
+  }, [result]);
 
   if (!result) {
     return (
@@ -50,15 +82,24 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
     );
   }
 
-  const total = Math.round(
-    result.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0) * 100
-  ) / 100;
+  // Build summary sentence
+  const insights = result.insights;
+  const summaryParts: string[] = [];
+  summaryParts.push(`Parsed ${result.summary.totalItems} line items`);
+  if (insights.typosFixed > 0) summaryParts.push(`corrected ${insights.typosFixed} typo${insights.typosFixed > 1 ? "s" : ""}`);
+  if (insights.abbreviationsResolved > 0) summaryParts.push(`resolved ${insights.abbreviationsResolved} abbreviation${insights.abbreviationsResolved > 1 ? "s" : ""}`);
+  if (insights.skusDirect > 0) summaryParts.push(`matched ${insights.skusDirect} direct SKU${insights.skusDirect > 1 ? "s" : ""}`);
+  const summaryText = summaryParts.join(", ") + ". All items matched to catalog.";
+
+  // Estimate manual processing time (rough: ~45s per line item for a human)
+  const manualTimeSec = result.summary.totalItems * 45;
+  const manualTimeMin = Math.round(manualTimeSec / 60);
 
   function downloadCSV() {
-    const header = "Product,SKU,Quantity,Unit,Unit Cost,Confidence";
+    const header = "Product,SKU,Quantity,Unit,Unit Cost,Confidence,Original Text";
     const rows = result!.items.map(
       (item) =>
-        `"${item.product}",${item.sku},${item.quantity},${item.unit},${item.unitPrice.toFixed(2)},${Math.round(item.confidence * 100)}%`
+        `"${item.product}",${item.sku},${item.quantity},${item.unit},${item.unitPrice.toFixed(2)},${Math.round(item.confidence * 100)}%,"${item.originalText}"`
     );
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -87,8 +128,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   return (
     <div className="flex flex-col h-full animate-fade-in">
-      {/* Header — padded to align with panel edges */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-4">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div>
           <h2 className="text-[13px] font-semibold text-p-text">Order Review</h2>
           <p className="text-[11px] text-p-text-secondary mt-0.5">
@@ -101,6 +142,16 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         >
           Clear
         </button>
+      </div>
+
+      {/* Insights banner */}
+      <div className="mx-5 mb-3 px-3 py-2 rounded-polaris bg-blue-50 border border-blue-100 animate-fade-in">
+        <div className="flex items-start gap-2">
+          <svg className="w-3.5 h-3.5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-[11px] text-blue-800 leading-relaxed">{summaryText}</p>
+        </div>
       </div>
 
       {/* Summary stats */}
@@ -129,26 +180,31 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           <div className="text-xl font-bold text-[#047b5d] tabular-nums">
             {Math.round(result.summary.matchRate * 100)}%
           </div>
-          <div className="text-[11px] text-p-text-secondary">Catalog Match</div>
+          <div className="text-[11px] text-p-text-secondary">Items Resolved</div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-6 h-6 rounded-polaris-sm bg-purple-50 flex items-center justify-center">
               <svg className="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
-          <div className="text-xl font-bold text-p-text tabular-nums">
-            {result.summary.processingTimeMs < 1000
-              ? `${result.summary.processingTimeMs}ms`
-              : `${(result.summary.processingTimeMs / 1000).toFixed(1)}s`}
+          <div className="flex items-baseline gap-1.5">
+            <div className="text-xl font-bold text-p-text tabular-nums">
+              {result.summary.processingTimeMs < 1000
+                ? `${result.summary.processingTimeMs}ms`
+                : `${(result.summary.processingTimeMs / 1000).toFixed(1)}s`}
+            </div>
+            <span className="text-[10px] text-p-text-secondary">
+              vs ~{manualTimeMin} min manual
+            </span>
           </div>
           <div className="text-[11px] text-p-text-secondary">Processing</div>
         </div>
       </div>
 
-      {/* Results table — flush to panel edges, cell padding creates alignment */}
+      {/* Results table */}
       <div className="flex-1 overflow-auto border-t border-p-border">
         <table className="w-full text-[13px]">
           <thead>
@@ -174,9 +230,20 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             {result.items.map((item, i) => (
               <tr
                 key={i}
-                className={`border-b border-p-border-secondary hover:bg-blue-50/40 transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)}`}
+                className={`border-b border-p-border-secondary hover:bg-blue-50/40 transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)} relative`}
+                onMouseEnter={() => setHoveredRow(i)}
+                onMouseLeave={() => setHoveredRow(null)}
               >
-                <td className="py-2.5 pl-5 pr-3 text-p-text font-medium">{item.product}</td>
+                <td className="py-2.5 pl-5 pr-3 text-p-text font-medium relative">
+                  <span>{item.product}</span>
+                  {/* Original text tooltip */}
+                  {hoveredRow === i && item.originalText !== item.product && (
+                    <div className="absolute left-5 top-full -mt-0.5 z-50 px-3 py-2 bg-[#1a1a1a] text-white text-[11px] rounded-lg shadow-polaris-lg max-w-xs animate-fade-in whitespace-normal">
+                      <div className="text-white/50 text-[10px] mb-0.5 font-medium">Original input:</div>
+                      <div className="font-mono text-amber-300">&quot;{item.originalText}&quot;</div>
+                    </div>
+                  )}
+                </td>
                 <td className="py-2.5 px-3">
                   <span
                     className={`font-mono text-[11px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap inline-block ${
@@ -203,7 +270,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                           item.confidence >= 0.95
                             ? "bg-[#047b5d]"
                             : item.confidence >= 0.75
-                            ? "bg-[#4ade80]"
+                            ? "bg-[#34d399]"
                             : "bg-amber-400"
                         }`}
                         style={{ width: `${item.confidence * 100}%` }}
@@ -228,12 +295,12 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         </table>
       </div>
 
-      {/* Footer — padded to match header */}
+      {/* Footer */}
       <div className="flex items-center justify-between px-5 py-3 border-t border-p-border">
         <div className="text-[13px] text-p-text-secondary">
           Order Total:{" "}
-          <span className="text-p-text font-bold text-base">
-            ${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <span className="text-p-text font-bold text-base tabular-nums">
+            ${animatedTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -272,7 +339,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm transition-all shadow-polaris-sm ${
               approved
                 ? "bg-[#cdfee1] text-[#047b5d] border border-green-200"
-                : "bg-[#008060] text-white hover:bg-[#006e52]"
+                : "bg-p-fill-brand text-white hover:bg-p-fill-brand-hover"
             }`}
           >
             {approved ? (

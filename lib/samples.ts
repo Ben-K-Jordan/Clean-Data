@@ -70,3 +70,52 @@ navy structured cap,300,6.75
 blk crew socks,800,$3.25
 white crew soks,600,3.25
 knit beanie blk,200,$5.50`;
+
+export const sampleEdgeCase = `---------- Forwarded from Devon's iMessage ----------
+
+yo so I talked to the warehouse guys and we're basically out of everything lol
+
+here's what sarah texted me (copy pasting raw):
+
+   500 blk tees med (the essential crew necks)
+   275 wht tshirts M
+   200 nvy tees medium pls
+
+hoodies r literally urgent rn!!!
+   300x blk heavywt hodie M
+   gry hoodey med,175,$22.00
+
+sweatshirts (crewneck style):
+   150 blk crwneck sweatshrt M
+
+^^ sarah says double check those qtys
+
+JOGGERS:
+   blk jogger pants med,400,$16.25
+   gry joggrs med,250,16.25
+
+---------- from marcus's email ----------
+
+   indgo denim jns 32,120,$24.00
+   100 blk denim 32
+
+shorts r low too smh
+   200 khki chino shrts medium + 175 nvy chno shrts med
+
+outerwear (for fall):
+   bombr jackt blk M,125,$34.00
+   80x olve bombr jacket lrg
+
+accessories/misc:
+   500 blk 6panl cap
+   nvy cap structurd,300,$6.75
+   blk crew soks,800,$3.25
+   600 wht crew soks
+   250 knit beane blk
+
+oh and jake said add 200 more blk tees lrg
+
+k thats everything i think?? lmk
+- Devon`;
+
+
