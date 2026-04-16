@@ -7,14 +7,20 @@ interface DataInputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  onImageUpload?: (base64: string, mimeType: string, fileName: string) => void;
   isLoading: boolean;
+  uploadedImagePreview?: string | null;
+  isScanning?: boolean;
 }
 
 export default function DataInput({
   value,
   onChange,
   onSubmit,
+  onImageUpload,
   isLoading,
+  uploadedImagePreview,
+  isScanning,
 }: DataInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -31,23 +37,22 @@ export default function DataInput({
         setUploadedFile(file.name);
       };
       reader.readAsText(file);
-    } else {
-      // Simulate OCR extraction for PDFs, images, etc.
+    } else if (file.type.startsWith("image/") && onImageUpload) {
+      // Read image as base64 for AI vision processing
       setUploadedFile(file.name);
-      setTimeout(() => {
-        onChange(
-          `Scanned from: ${file.name}\n\n` +
-          `Purchase Order #PO-2026-04355\nDate: April 14, 2026\nFrom: Kova Studios\n\n` +
-          `Essential Crew Tee Black/M     | TEE-BLK-M   | 750  | EA  | $8.50\n` +
-          `Essential Crew Tee White/M     | TEE-WHT-M   | 500  | EA  | $8.50\n` +
-          `Heavyweight Hoodie Black/M     | HOOD-BLK-M  | 300  | EA  | $22.00\n` +
-          `Heavyweight Hoodie Grey/M      | HOOD-GRY-M  | 200  | EA  | $22.00\n` +
-          `Slim Fit Jogger Black/M        | JGR-BLK-M   | 400  | EA  | $16.25\n` +
-          `Straight Leg Denim Indigo/32   | DNM-IND-32  | 150  | EA  | $24.00\n` +
-          `Lightweight Bomber Black/M     | JKT-BLK-M   | 125  | EA  | $34.00\n` +
-          `Structured Cap Black           | CAP-BLK     | 600  | EA  | $6.75`
-        );
-      }, 300);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        // Extract base64 data (remove "data:image/png;base64," prefix)
+        const base64 = dataUrl.split(",")[1];
+        const mimeType = file.type || "image/png";
+        onImageUpload(base64, mimeType, file.name);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // Unsupported file type fallback
+      setUploadedFile(file.name);
+      onChange(`[Unsupported file: ${file.name}]\nPlease paste order data as text, or upload an image of the order.`);
     }
   }
 
@@ -133,12 +138,55 @@ export default function DataInput({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        <textarea
-          value={value}
-          onChange={(e) => { setUploadedFile(null); onChange(e.target.value); }}
-          placeholder="Paste order data here...&#10;&#10;Emails, purchase orders, CSVs, or drag and drop a document to scan it."
-          className="w-full h-full bg-p-surface border border-p-border rounded-polaris p-4 text-[13px] text-p-text placeholder:text-p-text-secondary/40 resize-none focus:outline-none focus:ring-2 focus:ring-[#005bd3]/20 focus:border-[#005bd3]/40 font-mono leading-relaxed shadow-polaris-sm transition-shadow"
-        />
+        {uploadedImagePreview ? (
+          <div className="w-full h-full bg-p-surface border border-p-border rounded-polaris p-4 flex flex-col items-center justify-center gap-3 shadow-polaris-sm relative overflow-hidden">
+            <div className="relative max-h-[80%] max-w-full">
+              <img
+                src={uploadedImagePreview}
+                alt="Uploaded order"
+                className="max-h-full max-w-full object-contain rounded-polaris border border-p-border-secondary shadow-polaris-sm"
+              />
+              {/* Scanning overlay */}
+              {isScanning && (
+                <div className="absolute inset-0 rounded-polaris overflow-hidden pointer-events-none">
+                  {/* Dark tint overlay */}
+                  <div className="absolute inset-0 bg-black/10 animate-scan-pulse" />
+                  {/* Scanning line */}
+                  <div className="absolute left-0 right-0 h-[3px] animate-scan-line" style={{ boxShadow: '0 0 15px 5px rgba(48, 48, 48, 0.4)' }}>
+                    <div className="w-full h-full bg-gradient-to-r from-transparent via-[#303030] to-transparent" />
+                    {/* Glow below the line */}
+                    <div className="w-full h-8 bg-gradient-to-b from-[#303030]/20 to-transparent" />
+                  </div>
+                  {/* Corner brackets */}
+                  <div className="absolute top-2 left-2 w-5 h-5 border-t-2 border-l-2 border-[#303030] animate-scan-corner" />
+                  <div className="absolute top-2 right-2 w-5 h-5 border-t-2 border-r-2 border-[#303030] animate-scan-corner" style={{ animationDelay: '0.25s' }} />
+                  <div className="absolute bottom-2 left-2 w-5 h-5 border-b-2 border-l-2 border-[#303030] animate-scan-corner" style={{ animationDelay: '0.5s' }} />
+                  <div className="absolute bottom-2 right-2 w-5 h-5 border-b-2 border-r-2 border-[#303030] animate-scan-corner" style={{ animationDelay: '0.75s' }} />
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-p-text-secondary">
+              {isScanning ? (
+                <span className="flex items-center gap-1.5 text-p-text font-medium">
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Scanning document...
+                </span>
+              ) : (
+                <>Click &quot;Process Order&quot; to scan with AI vision</>
+              )}
+            </p>
+          </div>
+        ) : (
+          <textarea
+            value={value}
+            onChange={(e) => { setUploadedFile(null); onChange(e.target.value); }}
+            placeholder="Paste order data here...&#10;&#10;Emails, purchase orders, CSVs, or drag and drop a document to scan it."
+            className="w-full h-full bg-p-surface border border-p-border rounded-polaris p-4 text-[13px] text-p-text placeholder:text-p-text-secondary/40 resize-none focus:outline-none focus:ring-2 focus:ring-[#005bd3]/20 focus:border-[#005bd3]/40 font-mono leading-relaxed shadow-polaris-sm transition-shadow"
+          />
+        )}
         {dragActive && (
           <div className="absolute inset-0 bg-green-50/80 border-2 border-dashed border-p-fill-brand rounded-polaris flex items-center justify-center pointer-events-none z-10">
             <div className="flex flex-col items-center gap-2">
@@ -163,7 +211,7 @@ export default function DataInput({
 
       <button
         onClick={onSubmit}
-        disabled={!value.trim() || isLoading}
+        disabled={(!value.trim() && !uploadedImagePreview) || isLoading}
         className="mt-3 w-full py-2.5 rounded-polaris bg-p-fill-brand text-white text-sm font-semibold hover:bg-p-fill-brand-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-polaris-sm hover:shadow-polaris"
       >
         {isLoading ? (

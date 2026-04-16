@@ -15,20 +15,29 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [showDemoMenu, setShowDemoMenu] = useState(false);
+  const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
   const startTimeRef = useRef(0);
   const demoAbortRef = useRef(false);
 
-  const processOrder = useCallback(async (data: string) => {
+  const processOrder = useCallback(async (data: string, image?: { base64: string; mimeType: string } | null) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
     startTimeRef.current = Date.now();
 
     try {
+      const payload: Record<string, string> = { rawData: data };
+      if (image) {
+        payload.imageData = image.base64;
+        payload.mimeType = image.mimeType;
+      }
+
       const res = await fetch("/api/clean", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawData: data }),
+        body: JSON.stringify(payload),
       });
 
       const json = await res.json();
@@ -54,12 +63,30 @@ export default function Home() {
   }, []);
 
   async function handleClean() {
-    await processOrder(rawData);
+    if (imageData) {
+      // Phase 1: Scan animation on the image (3 seconds)
+      setIsScanning(true);
+      await new Promise((r) => setTimeout(r, 3000));
+      setIsScanning(false);
+      // Phase 2: Processing animation on the right panel
+    }
+    await processOrder(rawData, imageData);
   }
 
   function handleClear() {
     setResult(null);
     setError(null);
+  }
+
+  function handleImageUpload(base64: string, mimeType: string, _fileName: string) {
+    setImageData({ base64, mimeType });
+    setImagePreview(`data:${mimeType};base64,${base64}`);
+    setRawData(""); // clear text since we're using image
+  }
+
+  function clearImage() {
+    setImageData(null);
+    setImagePreview(null);
   }
 
   async function runDemo(text: string) {
@@ -171,9 +198,12 @@ export default function Home() {
             <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
               <DataInput
                 value={rawData}
-                onChange={(v) => { demoAbortRef.current = true; setIsDemo(false); setRawData(v); }}
+                onChange={(v) => { demoAbortRef.current = true; setIsDemo(false); clearImage(); setRawData(v); }}
                 onSubmit={handleClean}
-                isLoading={isLoading || isDemo}
+                onImageUpload={handleImageUpload}
+                isLoading={isLoading || isDemo || isScanning}
+                uploadedImagePreview={imagePreview}
+                isScanning={isScanning}
               />
             </div>
 

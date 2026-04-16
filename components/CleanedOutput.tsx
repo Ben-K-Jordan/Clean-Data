@@ -99,19 +99,20 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   const manualTimeMin = Math.round(manualTimeSec / 60);
 
   function downloadCSV() {
+    const esc = (s: string) => `"${s.replace(/"/g, '""').replace(/[\r\n]+/g, " ")}"`;
     const header = "Product,SKU,Quantity,Unit,Unit Cost,Confidence,Original Text";
     const rows = result!.items.map(
       (item) =>
-        `"${item.product}",${item.sku},${item.quantity},${item.unit},${item.unitPrice.toFixed(2)},${Math.round(item.confidence * 100)}%,"${item.originalText}"`
+        `${esc(item.product)},${esc(item.sku)},${item.quantity},${esc(item.unit)},${item.unitPrice.toFixed(2)},${Math.round(item.confidence * 100)}%,${esc(item.originalText)}`
     );
-    const csv = [header, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    const csv = "\uFEFF" + [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "order-line-items.csv";
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   function copyToClipboard() {
