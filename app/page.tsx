@@ -6,7 +6,7 @@ import DataInput from "@/components/DataInput";
 import ProcessingView from "@/components/ProcessingView";
 import CleanedOutput from "@/components/CleanedOutput";
 import { CleanResult } from "@/lib/types";
-import { sampleEmail } from "@/lib/samples";
+import { sampleEmail, samplePO, sampleCSV } from "@/lib/samples";
 
 export default function Home() {
   const [rawData, setRawData] = useState("");
@@ -14,6 +14,7 @@ export default function Home() {
   const [result, setResult] = useState<CleanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDemo, setIsDemo] = useState(false);
+  const [showDemoMenu, setShowDemoMenu] = useState(false);
   const startTimeRef = useRef(0);
   const demoAbortRef = useRef(false);
 
@@ -61,7 +62,8 @@ export default function Home() {
     setError(null);
   }
 
-  async function runDemo() {
+  async function runDemo(text: string) {
+    setShowDemoMenu(false);
     // Reset everything
     setResult(null);
     setError(null);
@@ -69,9 +71,8 @@ export default function Home() {
     setIsDemo(true);
     demoAbortRef.current = false;
 
-    // Type out the email character by character
-    const text = sampleEmail;
-    const chunkSize = 3; // characters per tick for speed
+    // Type out character by character
+    const chunkSize = 3;
     for (let i = 0; i <= text.length; i += chunkSize) {
       if (demoAbortRef.current) return;
       const slice = text.slice(0, Math.min(i + chunkSize, text.length));
@@ -105,15 +106,54 @@ export default function Home() {
               </p>
             </div>
             {!result && !isLoading && !isDemo && (
-              <button
-                onClick={runDemo}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm bg-p-fill-brand text-white hover:bg-p-fill-brand-hover transition-all shadow-polaris-sm animate-fade-in"
-              >
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                Run Demo
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowDemoMenu(!showDemoMenu)}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm bg-p-fill-brand text-white hover:bg-p-fill-brand-hover transition-all shadow-polaris-sm animate-fade-in"
+                >
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Run Demo
+                  <svg className="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showDemoMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowDemoMenu(false)} />
+                    <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-p-border rounded-polaris shadow-polaris-md z-50 py-1 animate-fade-in">
+                      <button
+                        onClick={() => runDemo(sampleEmail)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-p-text hover:bg-p-surface-secondary transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-p-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Client Email
+                      </button>
+                      <button
+                        onClick={() => runDemo(samplePO)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-p-text hover:bg-p-surface-secondary transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-p-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Purchase Order
+                      </button>
+                      <button
+                        onClick={() => runDemo(sampleCSV)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-p-text hover:bg-p-surface-secondary transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-p-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Messy CSV
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
 
