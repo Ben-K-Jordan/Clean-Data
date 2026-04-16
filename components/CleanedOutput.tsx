@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { CleanResult } from "@/lib/types";
 
 interface CleanedOutputProps {
@@ -12,6 +13,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   const [copied, setCopied] = useState(false);
   const [approved, setApproved] = useState(false);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number; below: boolean } | null>(null);
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
   const [animatedTotal, setAnimatedTotal] = useState(0);
 
   const total = result
@@ -230,20 +233,26 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             {result.items.map((item, i) => (
               <tr
                 key={i}
+                ref={(el) => { rowRefs.current[i] = el; }}
                 className={`border-b border-p-border-secondary hover:bg-blue-50/40 transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)} relative`}
-                onMouseEnter={() => setHoveredRow(i)}
-                onMouseLeave={() => setHoveredRow(null)}
+                onMouseEnter={() => {
+                  setHoveredRow(i);
+                  const el = rowRefs.current[i];
+                  if (el) {
+                    const rect = el.getBoundingClientRect();
+                    const spaceAbove = rect.top;
+                    const showBelow = spaceAbove < 120;
+                    setTooltipPos({
+                      x: rect.left + 16,
+                      y: showBelow ? rect.bottom + 8 : rect.top - 8,
+                      below: showBelow,
+                    });
+                  }
+                }}
+                onMouseLeave={() => { setHoveredRow(null); setTooltipPos(null); }}
               >
-                <td className="py-2.5 pl-5 pr-3 text-p-text font-medium relative">
+                <td className="py-2.5 pl-5 pr-3 text-p-text font-medium">
                   <span>{item.product}</span>
-                  {/* Original text tooltip */}
-                  {hoveredRow === i && item.originalText !== item.product && (
-                    <div className="absolute left-5 bottom-full mb-1.5 z-50 px-3.5 py-2.5 bg-[#303030] rounded-polaris shadow-polaris-lg max-w-sm animate-fade-in whitespace-normal">
-                      <div className="text-white/60 text-[10px] font-semibold uppercase tracking-wider mb-1">Original input</div>
-                      <div className="font-mono text-[12px] text-white leading-relaxed">{item.originalText}</div>
-                      <div className="absolute left-6 top-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-[#303030]" />
-                    </div>
-                  )}
                 </td>
                 <td className="py-2.5 px-3">
                   <span
@@ -361,6 +370,31 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           </button>
         </div>
       </div>
+
+      {/* Portal tooltip – renders outside overflow containers */}
+      {hoveredRow !== null && tooltipPos && result.items[hoveredRow] && result.items[hoveredRow].originalText !== result.items[hoveredRow].product && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed z-[9999] px-3.5 py-2.5 bg-[#303030] rounded-polaris shadow-polaris-lg max-w-sm animate-fade-in whitespace-normal pointer-events-none"
+            style={{
+              left: tooltipPos.x,
+              top: tooltipPos.below ? tooltipPos.y : undefined,
+              bottom: tooltipPos.below ? undefined : `${window.innerHeight - tooltipPos.y}px`,
+            }}
+          >
+            <div className="text-white/60 text-[10px] font-semibold uppercase tracking-wider mb-1">Original input</div>
+            <div className="font-mono text-[12px] text-white leading-relaxed">{result.items[hoveredRow].originalText}</div>
+            <div
+              className={`absolute left-6 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent ${
+                tooltipPos.below
+                  ? "bottom-full border-b-[6px] border-b-[#303030]"
+                  : "top-full border-t-[6px] border-t-[#303030]"
+              }`}
+            />
+          </div>,
+          document.body
+        )
+      }
     </div>
   );
 }
