@@ -18,6 +18,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   const [animatedTotal, setAnimatedTotal] = useState(0);
   // Track accept/reject decisions for UNKNOWN rows by index
   const [unknownDecisions, setUnknownDecisions] = useState<Record<number, "accepted" | "rejected">>({});
+  // Track rows that have finished their delete animation (fully collapsed from view)
+  const [collapsedRows, setCollapsedRows] = useState<Record<number, true>>({});
 
   const total = result
     ? Math.round(
@@ -48,6 +50,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   useEffect(() => {
     setApproved(false);
     setUnknownDecisions({});
+    setCollapsedRows({});
   }, [result]);
 
   if (!result) {
@@ -258,12 +261,21 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
               const decision = unknownDecisions[i];
               const isRejected = isUnknown && decision === "rejected";
               const isAccepted = isUnknown && decision === "accepted";
+              const isCollapsed = collapsedRows[i];
+              if (isCollapsed) return null;
               return (
               <tr
                 key={i}
                 ref={(el) => { rowRefs.current[i] = el; }}
-                className={`border-b border-p-border-secondary transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)} relative ${
-                  isRejected ? "bg-gray-50 opacity-50" : isAccepted ? "bg-green-50/40" : "hover:bg-blue-50/40"
+                onAnimationEnd={(e) => {
+                  if (e.animationName === "rowDelete") {
+                    setCollapsedRows((c) => ({ ...c, [i]: true }));
+                  }
+                }}
+                className={`border-b border-p-border-secondary transition-colors relative ${
+                  isRejected
+                    ? "animate-row-delete"
+                    : `animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)} ${isAccepted ? "bg-green-50/40" : "hover:bg-blue-50/40"}`
                 }`}
                 onMouseEnter={() => {
                   setHoveredRow(i);
