@@ -119,19 +119,31 @@ export default function DataInput({
 
       {/* Upload indicator */}
       {uploadedFile && (
-        <div className="flex items-center gap-2 mb-2 px-3 py-2 rounded-polaris bg-green-50 border border-green-200 animate-fade-in">
-          <svg className="w-4 h-4 text-[#047b5d] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`flex items-center gap-2 mb-2 px-3 py-2 rounded-polaris animate-fade-in transition-colors duration-300 ${
+          isScanning
+            ? "bg-blue-50 border border-blue-200"
+            : hasResult
+            ? "bg-green-50 border border-green-200"
+            : "bg-p-surface-secondary border border-p-border"
+        }`}>
+          <svg className={`w-4 h-4 shrink-0 transition-colors duration-300 ${
+            isScanning ? "text-blue-600" : hasResult ? "text-[#047b5d]" : "text-p-text-secondary"
+          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <span className="text-[12px] text-[#047b5d] font-medium flex-1 truncate">{uploadedFile}</span>
-          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+          <span className={`text-[12px] font-medium flex-1 truncate transition-colors duration-300 ${
+            isScanning ? "text-blue-600" : hasResult ? "text-[#047b5d]" : "text-p-text-secondary"
+          }`}>{uploadedFile}</span>
+          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded transition-colors duration-300 ${
             isScanning
-              ? "text-blue-600/70 bg-blue-50"
+              ? "text-blue-700 bg-blue-100"
               : hasResult
-              ? "text-[#047b5d]/70 bg-green-100"
-              : "text-p-text-secondary bg-p-surface-secondary"
+              ? "text-[#047b5d] bg-green-100"
+              : "text-p-text-secondary bg-p-surface"
           }`}>{isScanning ? "Scanning..." : hasResult ? "Scanned" : "Uploaded"}</span>
-          <button onClick={clearFile} className="text-[#047b5d]/60 hover:text-[#047b5d] transition-colors">
+          <button onClick={clearFile} className={`transition-colors ${
+            isScanning ? "text-blue-400 hover:text-blue-600" : hasResult ? "text-[#047b5d]/60 hover:text-[#047b5d]" : "text-p-text-secondary hover:text-p-text"
+          }`}>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>

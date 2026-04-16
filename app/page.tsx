@@ -18,6 +18,7 @@ export default function Home() {
   const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [scanComplete, setScanComplete] = useState(false);
   const startTimeRef = useRef(0);
   const demoAbortRef = useRef(false);
 
@@ -65,9 +66,11 @@ export default function Home() {
   async function handleClean() {
     if (imageData) {
       // Phase 1: Scan animation on the image (3 seconds)
+      setScanComplete(false);
       setIsScanning(true);
       await new Promise((r) => setTimeout(r, 3000));
       setIsScanning(false);
+      setScanComplete(true);
       // Phase 2: Processing animation on the right panel
     }
     await processOrder(rawData, imageData);
@@ -87,6 +90,7 @@ export default function Home() {
   function clearImage() {
     setImageData(null);
     setImagePreview(null);
+    setScanComplete(false);
   }
 
   async function runDemo(text: string) {
@@ -204,7 +208,7 @@ export default function Home() {
                 isLoading={isLoading || isDemo || isScanning}
                 uploadedImagePreview={imagePreview}
                 isScanning={isScanning}
-                hasResult={!!result}
+                hasResult={scanComplete || !!result}
               />
             </div>
 
