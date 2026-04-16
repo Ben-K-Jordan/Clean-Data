@@ -4,9 +4,10 @@ import { CleanResult } from "@/lib/types";
 
 interface CleanedOutputProps {
   result: CleanResult | null;
+  onClear: () => void;
 }
 
-export default function CleanedOutput({ result }: CleanedOutputProps) {
+export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   if (!result) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-ventura-muted">
@@ -31,10 +32,56 @@ export default function CleanedOutput({ result }: CleanedOutputProps) {
     );
   }
 
-  const total = result.items.reduce(
-    (sum, item) => sum + item.quantity * item.unitPrice,
-    0
-  );
+  if (result.items.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-ventura-muted">
+        <div className="w-16 h-16 rounded-full border-2 border-dashed border-ventura-border flex items-center justify-center mb-4">
+          <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p className="text-sm text-ventura-text font-medium">No items found</p>
+        <p className="text-xs mt-1 text-center max-w-xs">
+          We couldn&apos;t extract any product data. Try pasting an email, purchase order, or CSV with product names and quantities.
+        </p>
+        <button
+          onClick={onClear}
+          className="mt-4 px-4 py-1.5 text-xs rounded-md bg-ventura-surface border border-ventura-border text-ventura-muted hover:text-ventura-text transition-colors"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  const total = Math.round(
+    result.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0) * 100
+  ) / 100;
+
+  function downloadCSV() {
+    const header = "Product,SKU,Quantity,Unit,Unit Price,Confidence";
+    const rows = result!.items.map(
+      (item) =>
+        `"${item.product}",${item.sku},${item.quantity},${item.unit},${item.unitPrice.toFixed(2)},${Math.round(item.confidence * 100)}%`
+    );
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cleaned-data.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function copyToClipboard() {
+    const lines = result!.items.map(
+      (item) =>
+        `${item.product}\t${item.sku}\t${item.quantity}\t${item.unit}\t$${item.unitPrice.toFixed(2)}`
+    );
+    const text = ["Product\tSKU\tQty\tUnit\tPrice", ...lines].join("\n");
+    navigator.clipboard.writeText(text);
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -42,9 +89,17 @@ export default function CleanedOutput({ result }: CleanedOutputProps) {
         <h2 className="text-sm font-medium text-ventura-text">
           Structured Output
         </h2>
-        <span className="text-xs text-ventura-muted px-2 py-0.5 rounded bg-ventura-surface border border-ventura-border">
-          {result.mode === "ai" ? "AI" : "Mock"} mode
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onClear}
+            className="text-xs text-ventura-muted hover:text-ventura-text transition-colors"
+          >
+            Clear
+          </button>
+          <span className="text-xs text-ventura-muted px-2 py-0.5 rounded bg-ventura-surface border border-ventura-border">
+            {result.mode === "ai" ? "AI" : "Mock"} mode
+          </span>
+        </div>
       </div>
 
       {/* Summary stats */}
@@ -75,7 +130,7 @@ export default function CleanedOutput({ result }: CleanedOutputProps) {
       <div className="flex-1 overflow-auto border border-ventura-border rounded-lg">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-ventura-border bg-ventura-surface">
+            <tr className="border-b border-ventura-border bg-ventura-surface sticky top-0">
               <th className="text-left p-3 text-xs font-medium text-ventura-muted">
                 Product
               </th>
@@ -123,7 +178,7 @@ export default function CleanedOutput({ result }: CleanedOutputProps) {
                       item.confidence >= 0.9
                         ? "text-ventura-success"
                         : item.confidence >= 0.7
-                        ? "text-yellow-400"
+                        ? "text-amber-300"
                         : "text-red-400"
                     }`}
                   >
@@ -136,17 +191,28 @@ export default function CleanedOutput({ result }: CleanedOutputProps) {
         </table>
       </div>
 
-      {/* Total and export */}
+      {/* Total and actions */}
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-ventura-border">
         <div className="text-sm text-ventura-muted">
           Total:{" "}
           <span className="text-ventura-text font-semibold">
-            ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            ${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
-        <button className="px-4 py-2 text-xs rounded-md bg-ventura-success/10 text-ventura-success border border-ventura-success/20 hover:bg-ventura-success/20 transition-colors">
-          Export to ERP
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={copyToClipboard}
+            className="px-3 py-2 text-xs rounded-md bg-ventura-surface border border-ventura-border text-ventura-muted hover:text-ventura-text transition-colors"
+          >
+            Copy
+          </button>
+          <button
+            onClick={downloadCSV}
+            className="px-4 py-2 text-xs rounded-md bg-ventura-success/10 text-ventura-success border border-ventura-success/20 hover:bg-ventura-success/20 transition-colors"
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
     </div>
   );

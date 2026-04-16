@@ -9,15 +9,25 @@ const steps = [
   { label: "Structuring output", detail: "Building clean line items..." },
 ];
 
-export default function ProcessingView() {
-  const [activeStep, setActiveStep] = useState(0);
+interface ProcessingViewProps {
+  startTime: number;
+}
+
+export default function ProcessingView({ startTime }: ProcessingViewProps) {
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
-    }, 600);
+      setElapsed(Date.now() - startTime);
+    }, 50);
     return () => clearInterval(interval);
-  }, []);
+  }, [startTime]);
+
+  // Steps advance based on elapsed time proportionally
+  const activeStep = Math.min(
+    Math.floor(elapsed / 400),
+    steps.length - 1
+  );
 
   return (
     <div className="flex flex-col items-center justify-center h-full py-12">
@@ -31,7 +41,7 @@ export default function ProcessingView() {
             }`}
           >
             <div
-              className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
+              className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 ${
                 i < activeStep
                   ? "bg-ventura-success text-white"
                   : i === activeStep
@@ -47,6 +57,9 @@ export default function ProcessingView() {
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-6 text-xs text-ventura-muted">
+        {(elapsed / 1000).toFixed(1)}s
       </div>
     </div>
   );
