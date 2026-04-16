@@ -181,6 +181,89 @@ function extractLineItem(line: string): LineItem | null {
   return null;
 }
 
+// Simple edit distance (Levenshtein) to measure typo severity
+function editDistance(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
+// Measure how "clean" the query was compared to the matched product
+function computeConfidence(query: string, match: { name: string; sku: string; aliases: string[] }): number {
+  const q = query.toLowerCase().trim();
+
+  // Direct SKU match — very high confidence
+  if (q.includes(match.sku.toLowerCase())) {
+    return 0.96 + Math.random() * 0.03; // 96-99%
+  }
+
+  // Compare query against all aliases and product name, find best similarity
+  const candidates = [match.name.toLowerCase(), ...match.aliases.map(a => a.toLowerCase())];
+  let bestSimilarity = 0;
+
+  for (const candidate of candidates) {
+    // Word-level overlap
+    const qWords = q.split(/[\s,/\-]+/).filter(w => w.length > 1);
+    const cWords = candidate.split(/[\s,/\-]+/).filter(w => w.length > 1);
+
+    let exactMatches = 0;
+    let fuzzyMatches = 0;
+    let totalTypoDistance = 0;
+
+    for (const cw of cWords) {
+      const exactMatch = qWords.find(qw => qw === cw);
+      if (exactMatch) {
+        exactMatches++;
+      } else {
+        // Find closest query word
+        let bestDist = Infinity;
+        for (const qw of qWords) {
+          const dist = editDistance(qw, cw);
+          if (dist < bestDist) bestDist = dist;
+        }
+        // Count as fuzzy match if edit distance is small relative to word length
+        if (bestDist <= Math.max(1, Math.floor(cw.length * 0.4))) {
+          fuzzyMatches++;
+          totalTypoDistance += bestDist;
+        }
+      }
+    }
+
+    const totalMatched = exactMatches + fuzzyMatches;
+    if (cWords.length === 0) continue;
+
+    // Base similarity from word coverage
+    const coverage = totalMatched / cWords.length;
+    // Penalize for typos — more edit distance = lower confidence
+    const typoPenalty = totalTypoDistance * 0.03;
+    // Bonus for exact matches over fuzzy
+    const exactBonus = cWords.length > 0 ? (exactMatches / cWords.length) * 0.1 : 0;
+
+    const similarity = coverage - typoPenalty + exactBonus;
+    if (similarity > bestSimilarity) bestSimilarity = similarity;
+  }
+
+  // Map similarity to confidence range
+  if (bestSimilarity >= 0.9) {
+    return 0.93 + Math.random() * 0.05; // 93-98% — clean, mostly exact words
+  } else if (bestSimilarity >= 0.7) {
+    return 0.82 + Math.random() * 0.10; // 82-92% — decent match, some abbreviations
+  } else if (bestSimilarity >= 0.4) {
+    return 0.68 + Math.random() * 0.12; // 68-80% — messy, typos, abbreviations
+  } else {
+    return 0.55 + Math.random() * 0.12; // 55-67% — very fuzzy match
+  }
+}
+
 function matchToCatalog(
   query: string,
   qty: number,
@@ -190,23 +273,7 @@ function matchToCatalog(
   const match = findBestMatch(query);
 
   if (match) {
-    // Vary confidence based on how closely the query matches
-    // SKU matches get highest confidence, fuzzy name matches get lower
-    const hasSku = /[A-Z]{2,}-[A-Z]{2,}/i.test(query);
-    const queryWords = query.toLowerCase().split(/[\s,/]+/).filter(w => w.length > 1);
-    const nameWords = match.name.toLowerCase().split(/[\s,/\-]+/).filter(w => w.length > 1);
-    const overlap = nameWords.filter(nw => queryWords.some(qw => qw === nw || nw.includes(qw) || qw.includes(nw))).length;
-    const ratio = nameWords.length > 0 ? overlap / nameWords.length : 0;
-
-    let confidence: number;
-    if (hasSku) {
-      confidence = 0.97 + Math.random() * 0.02; // 97-99%
-    } else if (ratio > 0.6) {
-      confidence = 0.88 + Math.random() * 0.09; // 88-97%
-    } else {
-      confidence = 0.72 + Math.random() * 0.15; // 72-87%
-    }
-    confidence = Math.round(confidence * 100) / 100;
+    const confidence = Math.round(computeConfidence(query, match) * 100) / 100;
 
     return {
       product: match.name,
