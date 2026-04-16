@@ -91,7 +91,7 @@ export function mockImageClean(): CleanResult {
     },
     {
       product: "Midweight Crewneck Sweatshirt - Black / M",
-      sku: "CRNK-BLK-M",
+      sku: "CREW-BLK-M",
       quantity: 150,
       unit: "EA",
       unitPrice: 18.75,

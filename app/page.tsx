@@ -64,6 +64,7 @@ export default function Home() {
   }, []);
 
   async function handleClean() {
+    if (isLoading || isScanning || isDemo) return; // prevent re-entry
     if (imageData) {
       // Phase 1: Scan animation on the image (3 seconds)
       setScanComplete(false);

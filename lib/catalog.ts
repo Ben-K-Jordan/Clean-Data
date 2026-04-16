@@ -14,7 +14,7 @@ export const catalog: CatalogItem[] = [
     name: "Essential Crew Tee - Black / M",
     unitPrice: 8.50,
     unit: "EA",
-    aliases: ["crew neck tee black", "black tshirt medium", "essential tee black", "crew tee blk m", "black crew neck", "blk tees med", "blk tee med", "blk essential tee", "blk crewnck tee med"],
+    aliases: ["crew neck tee black", "black tshirt medium", "essential tee black", "crew tee blk m", "black crew neck tee", "blk tees med", "blk tee med", "blk essential tee", "blk crewnck tee med"],
   },
   {
     sku: "TEE-BLK-L",
@@ -28,7 +28,7 @@ export const catalog: CatalogItem[] = [
     name: "Essential Crew Tee - White / M",
     unitPrice: 8.50,
     unit: "EA",
-    aliases: ["white tshirt", "essential tee white", "crew tee white medium", "white crew neck", "white t-shirt", "wht tshirts", "wht tees", "wht essential tee"],
+    aliases: ["white tshirt", "essential tee white", "crew tee white medium", "white crew neck tee", "white t-shirt", "wht tshirts", "wht tees", "wht essential tee"],
   },
   {
     sku: "TEE-WHT-L",
@@ -140,7 +140,7 @@ export const catalog: CatalogItem[] = [
     name: "Lightweight Bomber Jacket - Olive / L",
     unitPrice: 34.00,
     unit: "EA",
-    aliases: ["bomber jacket olive", "olive bomber", "green bomber jacket", "bomber olv l", "olve bombr jacket lrg", "olv bomber lrg"],
+    aliases: ["bomber jacket olive", "olive bomber", "green bomber jacket", "bomber olv l", "olve bombr jacket lrg", "olv bomber lrg", "olive bomber jacket l", "olive bombr jacket l", "olive bomber jacket large", "olive bomber l"],
   },
   {
     sku: "CAP-BLK",
@@ -161,14 +161,14 @@ export const catalog: CatalogItem[] = [
     name: "Athletic Crew Sock - Black / One Size",
     unitPrice: 3.25,
     unit: "PR",
-    aliases: ["crew sock black", "black socks", "athletic socks blk", "socks black", "blk crew soks", "blk soks"],
+    aliases: ["crew sock black", "black socks", "athletic socks blk", "socks black", "blk crew soks", "blk crew socks", "blk soks", "black crew socks", "black crew sock", "black crew soks", "black soks", "crew soks black", "crew socks black"],
   },
   {
     sku: "SCK-WHT-OS",
     name: "Athletic Crew Sock - White / One Size",
     unitPrice: 3.25,
     unit: "PR",
-    aliases: ["crew sock white", "white socks", "athletic socks wht", "socks white", "wht crew soks", "wht soks"],
+    aliases: ["crew sock white", "white socks", "athletic socks wht", "socks white", "wht crew soks", "wht crew socks", "wht soks", "white crew socks", "white crew sock", "white crew soks", "white soks", "crew soks white", "crew socks white"],
   },
   {
     sku: "BNE-BLK-OS",
