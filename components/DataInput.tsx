@@ -160,8 +160,8 @@ export default function DataInput({
       >
         {uploadedImagePreview ? (
           <div
-            className="w-full bg-p-surface border border-p-border rounded-polaris shadow-polaris-sm relative overflow-y-auto overflow-x-hidden"
-            style={{ maxHeight: "min(60vh, 600px)" }}
+            className="w-full h-full bg-p-surface border border-p-border rounded-polaris shadow-polaris-sm relative overflow-y-auto overflow-x-hidden"
+            style={{ maxHeight: "min(55vh, 520px)" }}
           >
             <div className="relative p-4 flex justify-center">
               <img
