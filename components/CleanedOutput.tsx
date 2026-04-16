@@ -104,7 +104,7 @@ export default function CleanedOutput({ result }: CleanedOutputProps) {
                   <span
                     className={`font-mono text-xs px-1.5 py-0.5 rounded ${
                       item.sku !== "UNKNOWN"
-                        ? "bg-ventura-accent/10 text-ventura-accent"
+                        ? "bg-ventura-success/10 text-ventura-success"
                         : "bg-red-500/10 text-red-400"
                     }`}
                   >

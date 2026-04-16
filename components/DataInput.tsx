@@ -65,7 +65,7 @@ export default function DataInput({
       <button
         onClick={onSubmit}
         disabled={!value.trim() || isLoading}
-        className="mt-3 w-full py-2.5 rounded-lg bg-ventura-accent text-white text-sm font-medium hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="mt-3 w-full py-2.5 rounded-lg bg-ventura-accent text-white text-sm font-medium hover:bg-[#006e52] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {isLoading ? "Processing..." : "Clean Data"}
       </button>

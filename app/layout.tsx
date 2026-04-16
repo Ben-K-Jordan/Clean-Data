@@ -5,9 +5,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Clean Data | Ventura Demo",
+  title: "Clean Data | Shopify Demo",
   description:
-    "See how Ventura transforms messy distributor data into structured, catalog-matched line items.",
+    "See how AI transforms messy product data into structured, catalog-matched line items for Shopify.",
 };
 
 export default function RootLayout({
