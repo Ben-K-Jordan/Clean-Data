@@ -100,7 +100,7 @@ export default function Home() {
             <h1 className="text-lg font-bold text-p-text tracking-tight">
               Structured Orders
             </h1>
-            {!result && !isLoading && !isDemo && (
+            {!isLoading && !isDemo && (
               <div className="relative">
                 <button
                   onClick={() => setShowDemoMenu(!showDemoMenu)}
