@@ -23,42 +23,38 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
     return () => clearInterval(interval);
   }, [startTime]);
 
-  // Steps advance based on elapsed time proportionally
-  const activeStep = Math.min(
-    Math.floor(elapsed / 400),
-    steps.length - 1
-  );
+  const activeStep = Math.min(Math.floor(elapsed / 400), steps.length - 1);
 
   return (
     <div className="flex flex-col items-center justify-center h-full py-12">
-      <div className="w-10 h-10 border-2 border-ventura-accent border-t-transparent rounded-full animate-spin mb-6" />
+      <div className="w-8 h-8 border-2 border-p-fill-brand border-t-transparent rounded-full animate-spin mb-6" />
       <div className="space-y-3 w-full max-w-xs">
         {steps.map((step, i) => (
           <div
             key={step.label}
             className={`flex items-center gap-3 transition-opacity duration-300 ${
-              i <= activeStep ? "opacity-100" : "opacity-20"
+              i <= activeStep ? "opacity-100" : "opacity-30"
             }`}
           >
             <div
               className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 ${
                 i < activeStep
-                  ? "bg-ventura-success text-white"
+                  ? "bg-p-fill-success text-white"
                   : i === activeStep
-                  ? "bg-ventura-accent text-white"
-                  : "bg-ventura-border text-ventura-muted"
+                  ? "bg-p-fill-brand text-white"
+                  : "bg-p-border text-p-text-secondary"
               }`}
             >
               {i < activeStep ? "\u2713" : i + 1}
             </div>
             <div>
-              <div className="text-sm text-ventura-text">{step.label}</div>
-              <div className="text-xs text-ventura-muted">{step.detail}</div>
+              <div className="text-sm text-p-text font-medium">{step.label}</div>
+              <div className="text-xs text-p-text-secondary">{step.detail}</div>
             </div>
           </div>
         ))}
       </div>
-      <div className="mt-6 text-xs text-ventura-muted">
+      <div className="mt-6 text-xs text-p-text-secondary">
         {(elapsed / 1000).toFixed(1)}s
       </div>
     </div>
