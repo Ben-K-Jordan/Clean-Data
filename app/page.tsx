@@ -58,21 +58,13 @@ export default function Home() {
       <main className="flex-1 overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-5 py-5 h-full flex flex-col">
           {/* Page header — px matches panel inner padding so text aligns */}
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h1 className="text-lg font-bold text-p-text tracking-tight">
-                Order Processing
-              </h1>
-              <p className="text-[13px] text-p-text-secondary mt-0.5">
-                Automatically parse incoming orders and match to your product catalog
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-p-text-secondary">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Powered by AI
-            </div>
+          <div className="mb-4">
+            <h1 className="text-lg font-bold text-p-text tracking-tight">
+              Order Processing
+            </h1>
+            <p className="text-[13px] text-p-text-secondary mt-0.5">
+              Automatically parse incoming orders and match to your product catalog
+            </p>
           </div>
 
           {/* Main content */}
