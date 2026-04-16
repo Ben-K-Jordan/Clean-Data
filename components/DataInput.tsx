@@ -160,11 +160,12 @@ export default function DataInput({
       >
         {uploadedImagePreview ? (
           <div className="w-full h-full min-h-0 bg-p-surface border border-p-border rounded-polaris p-4 flex flex-col items-center justify-center gap-3 shadow-polaris-sm relative overflow-hidden">
-            <div className="relative flex-1 min-h-0 max-w-full flex items-center justify-center">
+            <div className="relative w-full flex-1 min-h-0 max-w-full flex items-center justify-center" style={{ maxHeight: "55vh" }}>
               <img
                 src={uploadedImagePreview}
                 alt="Uploaded order"
                 className="max-h-full max-w-full object-contain rounded-polaris border border-p-border-secondary shadow-polaris-sm"
+                style={{ maxHeight: "55vh" }}
               />
               {/* Scanning overlay — blue transparent bar sweeping down then up */}
               {isScanning && (
