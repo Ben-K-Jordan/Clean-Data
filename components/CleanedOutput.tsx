@@ -94,6 +94,10 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   // Build summary sentence
   const insights = result.insights;
   const unmatchedCount = result.items.filter((i) => i.sku === "UNKNOWN").length;
+  // Count UNKNOWN items that haven't had a decision yet (button is gated on this)
+  const pendingUnknownCount = result.items.reduce((acc, item, idx) => {
+    return acc + (item.sku === "UNKNOWN" && !unknownDecisions[idx] ? 1 : 0);
+  }, 0);
   const summaryParts: string[] = [];
   summaryParts.push(`Parsed ${result.summary.totalItems} line items`);
   if (insights.typosFixed > 0) summaryParts.push(`corrected ${insights.typosFixed} typo${insights.typosFixed > 1 ? "s" : ""}`);
@@ -421,10 +425,13 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           </button>
           <button
             onClick={handleApprove}
-            disabled={approved}
+            disabled={approved || pendingUnknownCount > 0}
+            title={pendingUnknownCount > 0 ? `Resolve ${pendingUnknownCount} flagged item${pendingUnknownCount > 1 ? "s" : ""} first` : undefined}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm transition-all shadow-polaris-sm ${
               approved
                 ? "bg-[#cdfee1] text-[#047b5d] border border-green-200"
+                : pendingUnknownCount > 0
+                ? "bg-p-surface-secondary text-p-text-secondary border border-p-border cursor-not-allowed"
                 : "bg-p-fill-brand text-white hover:bg-p-fill-brand-hover"
             }`}
           >
@@ -434,6 +441,13 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 Pushed to Shopify
+              </>
+            ) : pendingUnknownCount > 0 ? (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Resolve {pendingUnknownCount} flagged item{pendingUnknownCount > 1 ? "s" : ""}
               </>
             ) : (
               <>
