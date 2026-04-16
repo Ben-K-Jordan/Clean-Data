@@ -92,12 +92,20 @@ export default function Home() {
     setImageData({ base64, mimeType });
     setImagePreview(`data:${mimeType};base64,${base64}`);
     setRawData(""); // clear text since we're using image
+    // Reset state from any previous run so the badge starts fresh as "Uploaded"
+    setScanComplete(false);
+    setIsScanning(false);
+    setResult(null);
+    setError(null);
   }
 
   function clearImage() {
     setImageData(null);
     setImagePreview(null);
     setScanComplete(false);
+    setIsScanning(false);
+    setResult(null);
+    setError(null);
   }
 
   async function runDemo(text: string) {
