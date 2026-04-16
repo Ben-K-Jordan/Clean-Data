@@ -56,8 +56,8 @@ export default function Home() {
     <div className="flex flex-col h-screen bg-p-bg">
       <Header />
       <main className="flex-1 overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 py-5 h-full flex flex-col">
-          {/* Page header */}
+        <div className="max-w-[1400px] mx-auto px-5 py-5 h-full flex flex-col">
+          {/* Page header — px matches panel inner padding so text aligns */}
           <div className="mb-4 flex items-end justify-between">
             <div>
               <h1 className="text-lg font-bold text-p-text tracking-tight">
@@ -78,7 +78,7 @@ export default function Home() {
           {/* Main content */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.1fr] gap-4 flex-1 min-h-0">
             {/* Left panel: Input */}
-            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris overflow-hidden">
+            <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
               <DataInput
                 value={rawData}
                 onChange={setRawData}
@@ -88,11 +88,11 @@ export default function Home() {
             </div>
 
             {/* Right panel: Output */}
-            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris overflow-hidden">
+            <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
               {isLoading ? (
                 <ProcessingView startTime={startTimeRef.current} />
               ) : error ? (
-                <div className="flex flex-col items-center justify-center h-full animate-fade-in">
+                <div className="flex flex-col items-center justify-center h-full animate-fade-in p-5">
                   <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mb-4">
                     <svg className="w-6 h-6 text-p-fill-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
