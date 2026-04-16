@@ -34,7 +34,6 @@ export default function Home() {
         throw new Error(data.error || "Failed to clean data");
       }
 
-      // Ensure processing view shows for at least 1.5s in mock mode
       const elapsed = Date.now() - startTimeRef.current;
       if (elapsed < 1500 && mode === "mock") {
         await new Promise((r) => setTimeout(r, 1500 - elapsed));
@@ -54,23 +53,23 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-p-bg">
       <Header />
       <main className="flex-1 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 py-6 h-full">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-ventura-text">
-              Clean Data Demo
+        <div className="max-w-7xl mx-auto px-6 py-5 h-full">
+          <div className="mb-5">
+            <h1 className="text-xl font-bold text-p-text">
+              Clean Data
             </h1>
-            <p className="text-sm text-ventura-muted mt-1">
+            <p className="text-sm text-p-text-secondary mt-0.5">
               Paste messy emails, purchase orders, or CSVs and watch them
               transform into structured, catalog-matched line items.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100%-100px)]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100%-88px)]">
             {/* Left panel: Input */}
-            <div className="bg-ventura-bg border border-ventura-border rounded-xl p-5">
+            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris">
               <DataInput
                 value={rawData}
                 onChange={setRawData}
@@ -82,17 +81,22 @@ export default function Home() {
             </div>
 
             {/* Right panel: Output */}
-            <div className="bg-ventura-bg border border-ventura-border rounded-xl p-5">
+            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris">
               {isLoading ? (
                 <ProcessingView startTime={startTimeRef.current} />
               ) : error ? (
                 <div className="flex flex-col items-center justify-center h-full">
-                  <div className="text-red-400 text-sm text-center max-w-sm">
-                    <p className="font-medium mb-1">Error</p>
-                    <p className="text-ventura-muted">{error}</p>
+                  <div className="text-p-fill-critical text-sm text-center max-w-sm">
+                    <div className="w-10 h-10 rounded-full bg-p-bg-critical flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-5 h-5 text-p-fill-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                    <p className="font-semibold text-p-text mb-1">Something went wrong</p>
+                    <p className="text-p-text-secondary text-xs">{error}</p>
                     <button
                       onClick={handleClear}
-                      className="mt-4 px-4 py-1.5 text-xs rounded-md bg-ventura-surface border border-ventura-border text-ventura-muted hover:text-ventura-text transition-colors"
+                      className="mt-4 px-4 py-1.5 text-xs font-medium rounded-polaris-sm bg-p-surface border border-p-border text-p-text-secondary hover:bg-p-surface-secondary transition-colors"
                     >
                       Dismiss
                     </button>
