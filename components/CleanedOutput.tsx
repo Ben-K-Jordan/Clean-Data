@@ -201,22 +201,22 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                     <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${
-                          item.confidence >= 0.9
+                          item.confidence >= 0.95
                             ? "bg-[#047b5d]"
-                            : item.confidence >= 0.7
-                            ? "bg-amber-400"
-                            : "bg-red-400"
+                            : item.confidence >= 0.75
+                            ? "bg-[#4ade80]"
+                            : "bg-amber-400"
                         }`}
                         style={{ width: `${item.confidence * 100}%` }}
                       />
                     </div>
                     <span
                       className={`text-[11px] font-semibold tabular-nums ${
-                        item.confidence >= 0.9
+                        item.confidence >= 0.95
                           ? "text-[#047b5d]"
-                          : item.confidence >= 0.7
-                          ? "text-amber-600"
-                          : "text-p-fill-critical"
+                          : item.confidence >= 0.75
+                          ? "text-[#16a34a]"
+                          : "text-amber-600"
                       }`}
                     >
                       {Math.round(item.confidence * 100)}%
