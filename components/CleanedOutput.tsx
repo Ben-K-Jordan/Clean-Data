@@ -201,15 +201,37 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           </div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1">
-          <div className="text-xl font-bold text-[#047b5d] tabular-nums">
-            {Math.round(result.summary.matchRate * 100)}%
-          </div>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <svg className="w-3 h-3 text-p-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-[11px] text-p-text-secondary">Items Resolved</span>
-          </div>
+          {(() => {
+            const matched = result.items.filter((i) => i.sku !== "UNKNOWN").length;
+            const total = result.summary.totalItems;
+            const pct = Math.round(result.summary.matchRate * 100);
+            const isPerfect = pct === 100;
+            return (
+              <>
+                <div className="flex items-baseline gap-1.5">
+                  <div className={`text-xl font-bold tabular-nums ${isPerfect ? "text-[#047b5d]" : "text-amber-600"}`}>
+                    {pct}%
+                  </div>
+                  <span className="text-[10px] text-p-text-secondary tabular-nums">
+                    {matched} of {total} matched
+                  </span>
+                </div>
+                {/* Mini progress bar */}
+                <div className="mt-1.5 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${isPerfect ? "bg-[#047b5d]" : "bg-amber-500"}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <svg className="w-3 h-3 text-p-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-[11px] text-p-text-secondary">Items Resolved</span>
+                </div>
+              </>
+            );
+          })()}
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2">
           <div className="flex items-baseline gap-1.5">
