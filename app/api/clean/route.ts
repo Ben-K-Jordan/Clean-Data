@@ -5,14 +5,21 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    if (!body.rawData || typeof body.rawData !== "string") {
+    const hasText = body.rawData && typeof body.rawData === "string";
+    const hasImage = body.imageData && typeof body.imageData === "string";
+
+    if (!hasText && !hasImage) {
       return NextResponse.json(
-        { error: "rawData is required" },
+        { error: "rawData or imageData is required" },
         { status: 400 }
       );
     }
 
-    const result = await cleanData({ rawData: body.rawData });
+    const result = await cleanData({
+      rawData: body.rawData || "",
+      imageData: body.imageData,
+      mimeType: body.mimeType,
+    });
 
     return NextResponse.json(result);
   } catch (error) {

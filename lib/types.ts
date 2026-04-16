@@ -25,4 +25,6 @@ export interface CleanResult {
 
 export interface CleanRequest {
   rawData: string;
+  imageData?: string; // base64 encoded image
+  mimeType?: string;  // e.g. "image/png", "image/jpeg"
 }
