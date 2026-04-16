@@ -110,10 +110,14 @@ export default function Home() {
 
   async function runDemo(text: string) {
     setShowDemoMenu(false);
-    // Reset everything
+    // Reset everything including any pending image upload
     setResult(null);
     setError(null);
     setRawData("");
+    setImageData(null);
+    setImagePreview(null);
+    setScanComplete(false);
+    setIsScanning(false);
     setIsDemo(true);
     demoAbortRef.current = false;
 

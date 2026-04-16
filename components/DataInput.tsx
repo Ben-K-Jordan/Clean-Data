@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import SampleData from "./SampleData";
 
 interface DataInputProps {
@@ -27,6 +27,16 @@ export default function DataInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+
+  // Keep local uploadedFile in sync with parent's imagePreview state.
+  // If the parent clears the image (e.g. via runDemo or SampleData click),
+  // also clear the local filename so the notification bar disappears.
+  useEffect(() => {
+    if (!uploadedImagePreview && uploadedFile && !value) {
+      setUploadedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }, [uploadedImagePreview, value, uploadedFile]);
 
   function handleFile(file: File) {
     const isTextFile = file.type.startsWith("text/") || file.name.endsWith(".csv") || file.name.endsWith(".tsv");
@@ -112,7 +122,10 @@ export default function DataInput({
           accept=".pdf,.csv,.tsv,.txt,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.webp"
           className="hidden"
           onChange={(e) => {
-            if (e.target.files?.[0]) handleFile(e.target.files[0]);
+            const file = e.target.files?.[0];
+            if (file) handleFile(file);
+            // Reset so selecting the same file again still fires onChange
+            e.target.value = "";
           }}
         />
       </div>
