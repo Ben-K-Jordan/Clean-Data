@@ -16,6 +16,8 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number; below: boolean } | null>(null);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
   const [animatedTotal, setAnimatedTotal] = useState(0);
+  // Track accept/reject decisions for UNKNOWN rows by index
+  const [unknownDecisions, setUnknownDecisions] = useState<Record<number, "accepted" | "rejected">>({});
 
   const total = result
     ? Math.round(
@@ -42,9 +44,10 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
     return () => clearInterval(interval);
   }, [result, total]);
 
-  // Reset approved state when result changes
+  // Reset approved state and decisions when result changes
   useEffect(() => {
     setApproved(false);
+    setUnknownDecisions({});
   }, [result]);
 
   if (!result) {
@@ -250,11 +253,18 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             </tr>
           </thead>
           <tbody>
-            {result.items.map((item, i) => (
+            {result.items.map((item, i) => {
+              const isUnknown = item.sku === "UNKNOWN";
+              const decision = unknownDecisions[i];
+              const isRejected = isUnknown && decision === "rejected";
+              const isAccepted = isUnknown && decision === "accepted";
+              return (
               <tr
                 key={i}
                 ref={(el) => { rowRefs.current[i] = el; }}
-                className={`border-b border-p-border-secondary hover:bg-blue-50/40 transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)} relative`}
+                className={`border-b border-p-border-secondary transition-colors animate-fade-in-up opacity-0 stagger-${Math.min(i + 1, 10)} relative ${
+                  isRejected ? "bg-gray-50 opacity-50" : isAccepted ? "bg-green-50/40" : "hover:bg-blue-50/40"
+                }`}
                 onMouseEnter={() => {
                   setHoveredRow(i);
                   const el = rowRefs.current[i];
@@ -293,34 +303,68 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                   ${item.unitPrice.toFixed(2)}
                 </td>
                 <td className="py-2.5 pl-3 pr-5 text-right">
-                  <div className="flex items-center justify-end gap-1.5">
-                    <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          item.confidence >= 0.95
-                            ? "bg-[#047b5d]"
-                            : item.confidence >= 0.75
-                            ? "bg-[#34d399]"
-                            : "bg-amber-400"
-                        }`}
-                        style={{ width: `${item.confidence * 100}%` }}
-                      />
+                  {isUnknown ? (
+                    <div className="flex items-center justify-end gap-1.5">
+                      {decision ? (
+                        <span className={`text-[11px] font-semibold ${
+                          isAccepted ? "text-[#047b5d]" : "text-p-text-secondary"
+                        }`}>
+                          {isAccepted ? "Included" : "Skipped"}
+                        </span>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setUnknownDecisions((d) => ({ ...d, [i]: "rejected" }))}
+                            title="Skip this item"
+                            className="w-6 h-6 flex items-center justify-center rounded-polaris-sm border border-p-border bg-p-surface hover:bg-red-50 hover:border-red-300 text-p-text-secondary hover:text-p-fill-critical transition-colors"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => setUnknownDecisions((d) => ({ ...d, [i]: "accepted" }))}
+                            title="Include this item for manual review"
+                            className="w-6 h-6 flex items-center justify-center rounded-polaris-sm border border-p-border bg-p-surface hover:bg-green-50 hover:border-green-300 text-p-text-secondary hover:text-[#047b5d] transition-colors"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
                     </div>
-                    <span
-                      className={`text-[11px] font-semibold tabular-nums ${
-                        item.confidence >= 0.95
-                          ? "text-[#047b5d]"
-                          : item.confidence >= 0.75
-                          ? "text-[#16a34a]"
-                          : "text-amber-600"
-                      }`}
-                    >
-                      {Math.round(item.confidence * 100)}%
-                    </span>
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-end gap-1.5">
+                      <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            item.confidence >= 0.95
+                              ? "bg-[#047b5d]"
+                              : item.confidence >= 0.75
+                              ? "bg-[#34d399]"
+                              : "bg-amber-400"
+                          }`}
+                          style={{ width: `${item.confidence * 100}%` }}
+                        />
+                      </div>
+                      <span
+                        className={`text-[11px] font-semibold tabular-nums ${
+                          item.confidence >= 0.95
+                            ? "text-[#047b5d]"
+                            : item.confidence >= 0.75
+                            ? "text-[#16a34a]"
+                            : "text-amber-600"
+                        }`}
+                      >
+                        {Math.round(item.confidence * 100)}%
+                      </span>
+                    </div>
+                  )}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
