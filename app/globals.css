@@ -75,6 +75,32 @@ body {
   animation: scanSweep 2.4s ease-in-out infinite;
 }
 
+@keyframes rowDelete {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+    background-color: rgba(239, 68, 68, 0.08);
+  }
+  40% {
+    opacity: 0.6;
+    transform: translateX(30px);
+    background-color: rgba(239, 68, 68, 0.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120%);
+    background-color: rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-row-delete {
+  animation: rowDelete 0.5s ease-in forwards;
+}
+
+.row-collapsed {
+  display: none;
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out forwards;
 }
