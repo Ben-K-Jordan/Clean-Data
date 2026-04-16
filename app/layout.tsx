@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Clean Data | Shopify Demo",
+  title: "Shopify Structured Orders Demo",
   description:
     "See how AI transforms messy product data into structured, catalog-matched line items for Shopify.",
 };
