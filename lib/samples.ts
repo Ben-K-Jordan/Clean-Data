@@ -42,9 +42,9 @@ Slim Fit Jogger Black/L        | JGR-BLK-L   | 200  | EA  | $16.25
 Straight Leg Denim Indigo/32   | DNM-IND-32  | 150  | EA  | $24.00
 Structured 6-Panel Cap Black   | CAP-BLK     | 500  | EA  | $6.75
 
-Subtotal: $56,662.50
+Subtotal: $52,150.00
 Tax: —
-Total: $56,662.50
+Total: $52,150.00
 
 Payment Terms: Net 45
 Authorized By: Sofia Reyes, Operations Director`;
