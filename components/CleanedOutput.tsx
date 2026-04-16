@@ -57,7 +57,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         </div>
         <p className="text-[13px] font-medium text-p-text">Order Review</p>
         <p className="text-[11px] mt-1 text-center max-w-[260px]">
-          Processed orders will appear here for review before sending to your ERP system
+          Processed orders will appear here for review before pushing to Shopify
         </p>
       </div>
     );
@@ -87,12 +87,17 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   // Build summary sentence
   const insights = result.insights;
+  const unmatchedCount = result.items.filter((i) => i.sku === "UNKNOWN").length;
   const summaryParts: string[] = [];
   summaryParts.push(`Parsed ${result.summary.totalItems} line items`);
   if (insights.typosFixed > 0) summaryParts.push(`corrected ${insights.typosFixed} typo${insights.typosFixed > 1 ? "s" : ""}`);
   if (insights.abbreviationsResolved > 0) summaryParts.push(`resolved ${insights.abbreviationsResolved} abbreviation${insights.abbreviationsResolved > 1 ? "s" : ""}`);
   if (insights.skusDirect > 0) summaryParts.push(`matched ${insights.skusDirect} direct SKU${insights.skusDirect > 1 ? "s" : ""}`);
-  const summaryText = summaryParts.join(", ") + ". All items matched to catalog.";
+  const summaryText = summaryParts.join(", ") + (
+    unmatchedCount > 0
+      ? `. ${unmatchedCount} item${unmatchedCount > 1 ? "s" : ""} flagged for human review.`
+      : ". All items matched to catalog."
+  );
 
   // Estimate manual processing time (rough: ~45s per line item for a human)
   const manualTimeSec = result.summary.totalItems * 45;
@@ -137,7 +142,13 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
         <div>
           <h2 className="text-[13px] font-semibold text-p-text">Order Review</h2>
           <p className="text-[11px] text-p-text-secondary mt-0.5">
-            {result.summary.totalItems} line items matched to catalog — review before sending to ERP
+            {(() => {
+              const matched = result.items.filter((i) => i.sku !== "UNKNOWN").length;
+              const total = result.summary.totalItems;
+              return matched < total
+                ? `${matched} of ${total} line items matched — review before pushing to Shopify`
+                : `${total} line items matched to catalog — review before pushing to Shopify`;
+            })()}
           </p>
         </div>
         <button
@@ -149,12 +160,20 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
       </div>
 
       {/* Insights banner */}
-      <div className="mx-5 mb-3 px-3 py-2 rounded-polaris bg-blue-50 border border-blue-100 animate-fade-in">
+      <div className={`mx-5 mb-3 px-3 py-2 rounded-polaris animate-fade-in ${
+        unmatchedCount > 0
+          ? "bg-amber-50 border border-amber-200"
+          : "bg-blue-50 border border-blue-100"
+      }`}>
         <div className="flex items-start gap-2">
-          <svg className="w-3.5 h-3.5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${
+            unmatchedCount > 0 ? "text-amber-600" : "text-blue-600"
+          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-[11px] text-blue-800 leading-relaxed">{summaryText}</p>
+          <p className={`text-[11px] leading-relaxed ${
+            unmatchedCount > 0 ? "text-amber-800" : "text-blue-800"
+          }`}>{summaryText}</p>
         </div>
       </div>
 
@@ -358,14 +377,14 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Sent to ERP
+                Pushed to Shopify
               </>
             ) : (
               <>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Approve &amp; Send to ERP
+                Approve &amp; Push to Shopify
               </>
             )}
           </button>
