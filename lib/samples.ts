@@ -111,6 +111,7 @@ accessories/misc:
    blk crew soks,800,$3.25
    600 wht crew soks
    250 knit beane blk
+   40 leather belts brown
 
 oh and jake said add 200 more blk tees lrg
 
