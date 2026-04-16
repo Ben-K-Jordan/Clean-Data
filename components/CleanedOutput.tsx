@@ -83,7 +83,6 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
 
   function handleApprove() {
     setApproved(true);
-    setTimeout(() => setApproved(false), 3000);
   }
 
   return (
