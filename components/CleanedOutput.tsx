@@ -181,7 +181,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                 <td className="p-3 text-p-text font-medium">{item.product}</td>
                 <td className="p-3">
                   <span
-                    className={`font-mono text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                    className={`font-mono text-[11px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap inline-block ${
                       item.sku !== "UNKNOWN"
                         ? "bg-[#cdfee1] text-[#047b5d]"
                         : "bg-red-50 text-p-fill-critical border border-red-200"
