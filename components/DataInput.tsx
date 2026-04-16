@@ -21,7 +21,6 @@ export default function DataInput({
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
 
   function handleFile(file: File) {
-    // For demo: read text-based files directly, or fake-scan images/PDFs
     const isTextFile = file.type.startsWith("text/") || file.name.endsWith(".csv") || file.name.endsWith(".tsv");
 
     if (isTextFile) {
@@ -33,20 +32,20 @@ export default function DataInput({
       };
       reader.readAsText(file);
     } else {
-      // For PDFs, images, etc. — show filename and use a sample to simulate scanning
+      // Simulate OCR extraction for PDFs, images, etc.
       setUploadedFile(file.name);
-      // Simulate OCR extraction with a delay
       setTimeout(() => {
         onChange(
           `Scanned from: ${file.name}\n\n` +
-          `Purchase Order #PO-2024-8891\nDate: April 12, 2026\nVendor: TrendSet Boutique\n\n` +
-          `Classic Denim Jacket | SKU-1001 | 45 | EA | $89.99\n` +
-          `Organic Cotton T-Shirt | SKU-1002 | 120 | EA | $34.99\n` +
-          `Wireless Bluetooth Earbuds | SKU-3001 | 60 | EA | $79.99\n` +
-          `Leather Crossbody Bag | SKU-5001 | 35 | EA | $124.99\n` +
-          `Soy Wax Candle Set | SKU-6001 | 80 | EA | $28.99\n` +
-          `USB-C Fast Charger | SKU-3002 | 200 | EA | $24.99\n` +
-          `Premium Running Shoes | SKU-2001 | 50 | EA | $129.99`
+          `Purchase Order #PO-2026-04355\nDate: April 14, 2026\nFrom: Kova Studios\n\n` +
+          `Essential Crew Tee Black/M     | TEE-BLK-M   | 750  | EA  | $8.50\n` +
+          `Essential Crew Tee White/M     | TEE-WHT-M   | 500  | EA  | $8.50\n` +
+          `Heavyweight Hoodie Black/M     | HOOD-BLK-M  | 300  | EA  | $22.00\n` +
+          `Heavyweight Hoodie Grey/M      | HOOD-GRY-M  | 200  | EA  | $22.00\n` +
+          `Slim Fit Jogger Black/M        | JGR-BLK-M   | 400  | EA  | $16.25\n` +
+          `Straight Leg Denim Indigo/32   | DNM-IND-32  | 150  | EA  | $24.00\n` +
+          `Lightweight Bomber Black/M     | JKT-BLK-M   | 125  | EA  | $34.00\n` +
+          `Structured Cap Black           | CAP-BLK     | 600  | EA  | $6.75`
         );
       }, 300);
     }
@@ -80,8 +79,8 @@ export default function DataInput({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-[13px] font-semibold text-p-text">Raw Input</h2>
-          <p className="text-[11px] text-p-text-secondary mt-0.5">Paste data or upload a document to scan</p>
+          <h2 className="text-[13px] font-semibold text-p-text">Incoming Order</h2>
+          <p className="text-[11px] text-p-text-secondary mt-0.5">Paste order data or upload a document to scan</p>
         </div>
       </div>
 
@@ -139,7 +138,7 @@ export default function DataInput({
         <textarea
           value={value}
           onChange={(e) => { setUploadedFile(null); onChange(e.target.value); }}
-          placeholder="Paste your messy data here...&#10;&#10;Or drag and drop a document (PDF, CSV, image) to scan it."
+          placeholder="Paste order data here...&#10;&#10;Emails, purchase orders, CSVs, or drag and drop a document to scan it."
           className="w-full h-full bg-p-surface border border-p-border rounded-polaris p-4 text-[13px] text-p-text placeholder:text-p-text-secondary/40 resize-none focus:outline-none focus:ring-2 focus:ring-[#005bd3]/20 focus:border-[#005bd3]/40 font-mono leading-relaxed shadow-polaris-sm transition-shadow"
         />
         {dragActive && (
@@ -182,7 +181,7 @@ export default function DataInput({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Clean Data
+            Process Order
           </span>
         )}
       </button>

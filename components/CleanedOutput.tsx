@@ -10,6 +10,7 @@ interface CleanedOutputProps {
 
 export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   const [copied, setCopied] = useState(false);
+  const [approved, setApproved] = useState(false);
 
   if (!result) {
     return (
@@ -19,9 +20,9 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <p className="text-[13px] font-medium text-p-text">Structured output</p>
-        <p className="text-[11px] mt-1 text-center">
-          Results will appear here after processing
+        <p className="text-[13px] font-medium text-p-text">Order Review</p>
+        <p className="text-[11px] mt-1 text-center max-w-[260px]">
+          Processed orders will appear here for review before sending to your ERP system
         </p>
       </div>
     );
@@ -35,9 +36,9 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <p className="text-[13px] font-semibold text-p-text">No items found</p>
+        <p className="text-[13px] font-semibold text-p-text">No line items found</p>
         <p className="text-[11px] mt-1 text-center max-w-[240px]">
-          Try pasting an email, purchase order, or CSV with product names and quantities.
+          Try pasting a client email, purchase order, or CSV with product names and quantities.
         </p>
         <button
           onClick={onClear}
@@ -54,7 +55,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
   ) / 100;
 
   function downloadCSV() {
-    const header = "Product,SKU,Quantity,Unit,Unit Price,Confidence";
+    const header = "Product,SKU,Quantity,Unit,Unit Cost,Confidence";
     const rows = result!.items.map(
       (item) =>
         `"${item.product}",${item.sku},${item.quantity},${item.unit},${item.unitPrice.toFixed(2)},${Math.round(item.confidence * 100)}%`
@@ -64,7 +65,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "cleaned-data.csv";
+    a.download = "order-line-items.csv";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -74,19 +75,24 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
       (item) =>
         `${item.product}\t${item.sku}\t${item.quantity}\t${item.unit}\t$${item.unitPrice.toFixed(2)}`
     );
-    const text = ["Product\tSKU\tQty\tUnit\tPrice", ...lines].join("\n");
+    const text = ["Product\tSKU\tQty\tUnit\tCost", ...lines].join("\n");
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleApprove() {
+    setApproved(true);
+    setTimeout(() => setApproved(false), 3000);
   }
 
   return (
     <div className="flex flex-col h-full animate-fade-in">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-[13px] font-semibold text-p-text">Structured Output</h2>
+          <h2 className="text-[13px] font-semibold text-p-text">Order Review</h2>
           <p className="text-[11px] text-p-text-secondary mt-0.5">
-            {result.summary.totalItems} items matched to catalog
+            {result.summary.totalItems} line items matched to catalog — review before sending to ERP
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -112,7 +118,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           <div className="text-xl font-bold text-p-text tabular-nums">
             {result.summary.totalItems}
           </div>
-          <div className="text-[11px] text-p-text-secondary">Items Found</div>
+          <div className="text-[11px] text-p-text-secondary">Line Items</div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-1">
           <div className="flex items-center gap-2 mb-1">
@@ -125,7 +131,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           <div className="text-xl font-bold text-[#047b5d] tabular-nums">
             {Math.round(result.summary.matchRate * 100)}%
           </div>
-          <div className="text-[11px] text-p-text-secondary">Match Rate</div>
+          <div className="text-[11px] text-p-text-secondary">Catalog Match</div>
         </div>
         <div className="bg-p-surface border border-p-border rounded-polaris p-3 shadow-polaris-sm animate-count-up stagger-2">
           <div className="flex items-center gap-2 mb-1">
@@ -140,7 +146,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
               ? `${result.summary.processingTimeMs}ms`
               : `${(result.summary.processingTimeMs / 1000).toFixed(1)}s`}
           </div>
-          <div className="text-[11px] text-p-text-secondary">Speed</div>
+          <div className="text-[11px] text-p-text-secondary">Processing</div>
         </div>
       </div>
 
@@ -159,7 +165,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                 Qty
               </th>
               <th className="text-right p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
-                Price
+                Unit Cost
               </th>
               <th className="text-right p-3 text-[11px] font-semibold text-p-text-secondary uppercase tracking-wider">
                 Match
@@ -185,7 +191,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
                   </span>
                 </td>
                 <td className="p-3 text-right text-p-text tabular-nums font-medium">
-                  {item.quantity}
+                  {item.quantity.toLocaleString()}
                   <span className="text-p-text-secondary text-[11px] ml-1">{item.unit}</span>
                 </td>
                 <td className="p-3 text-right text-p-text tabular-nums">
@@ -227,7 +233,7 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
       {/* Total and actions */}
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-p-border">
         <div className="text-[13px] text-p-text-secondary">
-          Total:{" "}
+          Order Total:{" "}
           <span className="text-p-text font-bold text-base">
             ${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
@@ -255,12 +261,37 @@ export default function CleanedOutput({ result, onClear }: CleanedOutputProps) {
           </button>
           <button
             onClick={downloadCSV}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm bg-[#008060] text-white hover:bg-[#006e52] transition-all shadow-polaris-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-polaris-sm bg-p-surface border border-p-border text-p-text-secondary hover:bg-p-surface-secondary transition-all shadow-polaris-sm"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Export CSV
+          </button>
+          <button
+            onClick={handleApprove}
+            disabled={approved}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm transition-all shadow-polaris-sm ${
+              approved
+                ? "bg-[#cdfee1] text-[#047b5d] border border-green-200"
+                : "bg-[#008060] text-white hover:bg-[#006e52]"
+            }`}
+          >
+            {approved ? (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Sent to ERP
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Approve &amp; Send to ERP
+              </>
+            )}
           </button>
         </div>
       </div>

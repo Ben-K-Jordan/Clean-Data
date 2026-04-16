@@ -1,63 +1,72 @@
-export const sampleEmail = `From: jessica.wong@trendsetboutique.com
-Subject: Re: Restock Order - Spring Collection
+export const sampleEmail = `From: marcus.chen@elevateapparel.com
+Subject: Re: Fall '26 Reorder - Basics + Outerwear
 
-Hi there,
+Hey team,
 
-We're running low on a bunch of items and need to restock before the weekend rush. Here's what we need:
+We're putting together our restock for the fall push and need to get this order in ASAP. Here's what we're looking at:
 
-- 150 units of SKU-1001 (the black crew neck tees, medium)
-- 80x white t-shirts, medium
-- 50 navy crew neck tees, large
-- Dark wash slim jeans size 32 - need about 40 of those
-- 25x light wash denim jeans, size 34
-- 100 bluetooth earbuds (matte black)
-- USB-C charging cables, 6ft - need 200 of those
-- 60 laptop sleeves, 14 inch
+- 500 units of TEE-BLK-M (the essential crew tees, black medium)
+- 350x white crew tees, medium
+- 200 navy tees, medium
+- Black hoodies medium - need about 300 of those
+- 150x heather grey hoodies, medium
+- 400 black joggers medium
+- Grey joggers medium - need about 250
 
-Also need 75 canvas tote bags and 30 soy candles (lavender).
+Also need 200 black bomber jackets (medium) and 175 olive bombers (large).
 
-Can you confirm availability and get me a quote ASAP? We have a pop-up event Saturday.
+Oh and throw in 600 black caps and 400 pairs of black crew socks.
+
+Can you confirm lead times? We need everything by Sept 15th for our retail launch.
 
 Thanks,
-Jessica`;
+Marcus Chen
+Elevate Apparel — Head of Purchasing`;
 
 export const samplePO = `PURCHASE ORDER
-PO Number: PO-2024-03891
-Date: 2024-11-15
-Vendor: Global Goods Supply Co.
+PO Number: PO-2026-04218
+Date: 2026-04-10
+From: Riviera Streetwear Co.
+To: [Manufacturer]
 
-Bill To: TrendSet Boutique
-Ship To: 445 Market Street, Suite 200
+Ship To: 2200 Industrial Blvd, Unit 8, Los Angeles, CA 90058
 
-Crew Neck T-Shirt Black/M    | SKU-1001 | 200  | EA  | $24.99
-Crew Neck T-Shirt White/M    | SKU-1002 | 150  | EA  | $24.99
-Slim Fit Jeans Dark Wash/32  | SKU-2001 | 80   | EA  | $89.99
-Wireless Bluetooth Earbuds   | SKU-3001 | 120  | EA  | $79.99
-USB-C Fast Charging Cable    | SKU-3002 | 300  | EA  | $14.99
-Stainless Steel Water Bottle | SKU-5001 | 100  | EA  | $32.99
-Canvas Tote Bag Natural      | SKU-6001 | 250  | EA  | $18.99
+Essential Crew Tee Black/M     | TEE-BLK-M   | 800  | EA  | $8.50
+Essential Crew Tee Black/L     | TEE-BLK-L   | 600  | EA  | $8.50
+Essential Crew Tee White/M     | TEE-WHT-M   | 500  | EA  | $8.50
+Heavyweight Hoodie Black/M     | HOOD-BLK-M  | 400  | EA  | $22.00
+Heavyweight Hoodie Black/L     | HOOD-BLK-L  | 300  | EA  | $22.00
+Crewneck Sweatshirt Black/M    | CREW-BLK-M  | 250  | EA  | $18.75
+Slim Fit Jogger Black/M        | JGR-BLK-M   | 350  | EA  | $16.25
+Slim Fit Jogger Black/L        | JGR-BLK-L   | 200  | EA  | $16.25
+Straight Leg Denim Indigo/32   | DNM-IND-32  | 150  | EA  | $24.00
+Structured 6-Panel Cap Black   | CAP-BLK     | 500  | EA  | $6.75
 
-Subtotal: $34,282.80
-Tax (8.5%): $2,914.04
-Total: $37,196.84
+Subtotal: $56,662.50
+Tax: —
+Total: $56,662.50
 
-Payment Terms: Net 30
-Authorized By: David Park, Procurement Manager`;
+Payment Terms: Net 45
+Authorized By: Sofia Reyes, Operations Director`;
 
-export const sampleCSV = `product_desc,qty,price_each
-black crew neck tshirt medium,200,$24.99
-white tee shirt crew neck M,150,$24.99
-navy t-shirt large,100,24.99
-slim fit jeens dark wash 32,60,$89.99
-light wash dennim jeans 34,40,89.99
-wirless bluetooth earbuds blk,80,$79.99
-usb c chargng cable 6ft,250,14.99
-laptop sleev 14 inch grey,45,$34.99
-face moisturizr organic 2oz,100,28.99
-vitmin c brightning serum,60,$42.99
-stainles steel water bottel 24oz,120,32.99
-insualted travel mug 16oz blk,80,$27.99
-canvas tote bag natrual,200,18.99
-recycld polyester backpck charcoal,35,$64.99
-soy wax candel lavender 8oz,90,22.99
-esential oil diffusor ceramic,25,$44.99`;
+export const sampleCSV = `product,qty,unit_cost
+black crew neck tee medium,600,$8.50
+white essential tee M,400,$8.50
+navy tshirt medium,250,8.50
+blk heavyweight hodie M,300,$22.00
+grey hoodie medium,200,22.00
+crewneck sweatshrt black M,175,$18.75
+navy crewneck sweatshirt L,150,18.75
+black jogger pants medium,350,$16.25
+grey joggrs medium,200,16.25
+indigo denim jeans 32,120,$24.00
+black denim 32,100,24.00
+khaki chino shrts medium,180,$14.50
+navy chno shorts medium,150,14.50
+bomber jackt black M,125,$34.00
+olive bombr jacket L,100,34.00
+black 6 panel cap,500,$6.75
+navy structured cap,300,6.75
+blk crew socks,800,$3.25
+white crew soks,600,3.25
+knit beanie blk,200,$5.50`;
