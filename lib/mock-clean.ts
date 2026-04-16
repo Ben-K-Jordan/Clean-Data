@@ -39,17 +39,19 @@ export function mockClean(rawData: string): CleanResult {
     if (hasSku) {
       skusDirect++;
     } else {
-      // Check for abbreviations (blk, wht, nvy, gry, med, lrg, etc.)
-      if (/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|tee|hvy|ltwt)\b/i.test(orig)) {
-        abbreviationsResolved++;
+      // Count each abbreviation found in the original text
+      const abbrMatches = orig.match(/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|tee|hvy|ltwt|crwneck|crewnck|shrts|chno|soks|beane|bombr|jackt|joggrs|joger|sweatshrt|hodie|hoodey|panl|structurd|6panl|indgo|jns)\b/gi);
+      if (abbrMatches) {
+        abbreviationsResolved += abbrMatches.length;
       }
       // Check for likely typos by comparing words to product name
       const origWords = orig.split(/[\s,/\-]+/).filter(w => w.length > 2);
       const prodWords = item.product.toLowerCase().split(/[\s,/\-]+/).filter(w => w.length > 2);
       for (const ow of origWords) {
+        if (/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|hvy|ltwt)\b/i.test(ow)) continue; // skip standard abbreviations
         for (const pw of prodWords) {
           const dist = editDistance(ow, pw);
-          if (dist > 0 && dist <= 2 && dist < pw.length * 0.4) {
+          if (dist > 0 && dist <= 3 && dist < pw.length * 0.5) {
             typosFixed++;
             break;
           }
