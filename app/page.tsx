@@ -56,20 +56,29 @@ export default function Home() {
     <div className="flex flex-col h-screen bg-p-bg">
       <Header />
       <main className="flex-1 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 py-5 h-full">
-          <div className="mb-5">
-            <h1 className="text-xl font-bold text-p-text">
-              Clean Data
-            </h1>
-            <p className="text-sm text-p-text-secondary mt-0.5">
-              Paste messy emails, purchase orders, or CSVs and watch them
-              transform into structured, catalog-matched line items.
-            </p>
+        <div className="max-w-[1400px] mx-auto px-6 py-5 h-full flex flex-col">
+          {/* Page header */}
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-p-text tracking-tight">
+                Clean Data
+              </h1>
+              <p className="text-[13px] text-p-text-secondary mt-0.5">
+                Transform unstructured product data into catalog-ready line items
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] text-p-text-secondary">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Powered by AI
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100%-88px)]">
+          {/* Main content */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.1fr] gap-4 flex-1 min-h-0">
             {/* Left panel: Input */}
-            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris">
+            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris overflow-hidden">
               <DataInput
                 value={rawData}
                 onChange={setRawData}
@@ -80,27 +89,25 @@ export default function Home() {
               />
             </div>
 
-            {/* Right panel: Output */}
-            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris">
+            {/* Right panel: Output — slightly wider */}
+            <div className="bg-p-surface border border-p-border rounded-polaris-lg p-5 shadow-polaris overflow-hidden">
               {isLoading ? (
                 <ProcessingView startTime={startTimeRef.current} />
               ) : error ? (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="text-p-fill-critical text-sm text-center max-w-sm">
-                    <div className="w-10 h-10 rounded-full bg-p-bg-critical flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-5 h-5 text-p-fill-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                    <p className="font-semibold text-p-text mb-1">Something went wrong</p>
-                    <p className="text-p-text-secondary text-xs">{error}</p>
-                    <button
-                      onClick={handleClear}
-                      className="mt-4 px-4 py-1.5 text-xs font-medium rounded-polaris-sm bg-p-surface border border-p-border text-p-text-secondary hover:bg-p-surface-secondary transition-colors"
-                    >
-                      Dismiss
-                    </button>
+                <div className="flex flex-col items-center justify-center h-full animate-fade-in">
+                  <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mb-4">
+                    <svg className="w-6 h-6 text-p-fill-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
+                  <p className="text-[13px] font-semibold text-p-text mb-1">Something went wrong</p>
+                  <p className="text-[11px] text-p-text-secondary text-center max-w-[280px]">{error}</p>
+                  <button
+                    onClick={handleClear}
+                    className="mt-4 px-4 py-1.5 text-xs font-medium rounded-polaris-sm bg-p-surface border border-p-border text-p-text-secondary hover:bg-p-surface-secondary transition-colors shadow-polaris-sm"
+                  >
+                    Dismiss
+                  </button>
                 </div>
               ) : (
                 <CleanedOutput result={result} onClear={handleClear} />
