@@ -44,7 +44,7 @@ export async function aiClean(
   }
 
   const prompt = imageData
-    ? `You are a data extraction system for a clothing manufacturer/distributor. The attached image contains a handwritten or printed order. Read every line item from the image and extract each product, matching them to the product catalog below.
+    ? `You are a data extraction system for an industrial distributor (pipe, valves & fittings, fasteners, electrical, and MRO supplies). The attached image contains a handwritten or printed order. Read every line item from the image and extract each product, matching them to the product catalog below.
 
 PRODUCT CATALOG:
 ${catalogStr}
@@ -55,7 +55,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanation):
   "items": [
     {
       "product": "Full product name from catalog",
-      "sku": "SKU-XXXX",
+      "sku": "FAS-HXB-050",
       "quantity": 100,
       "unit": "EA",
       "unitPrice": 24.99,
@@ -74,7 +74,7 @@ Rules:
 - Use catalog unit price unless the image specifies a different price.
 - For originalText, write out exactly what appears in the image for that line (including typos, abbreviations, etc).
 - Ignore any non-product text (greetings, signatures, headers, doodles).`
-    : `You are a data extraction system for a clothing manufacturer/distributor. Parse the following raw input and extract line items, matching them to the product catalog below.
+    : `You are a data extraction system for an industrial distributor (pipe, valves & fittings, fasteners, electrical, and MRO supplies). Parse the following raw input and extract line items, matching them to the product catalog below.
 
 PRODUCT CATALOG:
 ${catalogStr}
@@ -87,7 +87,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanation):
   "items": [
     {
       "product": "Full product name from catalog",
-      "sku": "SKU-XXXX",
+      "sku": "FAS-HXB-050",
       "quantity": 100,
       "unit": "EA",
       "unitPrice": 24.99,

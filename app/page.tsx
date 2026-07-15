@@ -141,20 +141,20 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-p-bg">
+    <div className="flex flex-col h-screen bg-v-bg">
       <Header />
       <main className="flex-1 overflow-auto md:overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-5 py-5 min-h-full md:h-full flex flex-col">
           {/* Page header */}
           <div className="mb-4 flex items-end justify-between">
-            <h1 className="text-lg font-bold text-p-text tracking-tight">
+            <h1 className="text-lg font-bold text-v-text tracking-tight">
               Structured Orders
             </h1>
             {!isLoading && !isDemo && (
               <div className="relative">
                 <button
                   onClick={() => setShowDemoMenu(!showDemoMenu)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-polaris-sm bg-p-fill-brand text-white hover:bg-p-fill-brand-hover transition-all shadow-polaris-sm animate-fade-in"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-ventura-sm bg-v-fill-brand text-white hover:bg-v-fill-brand-hover transition-all shadow-ventura-sm animate-fade-in"
                 >
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
@@ -167,35 +167,35 @@ export default function Home() {
                 {showDemoMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowDemoMenu(false)} />
-                    <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-p-border rounded-polaris shadow-polaris-md z-50 py-1 animate-fade-in">
+                    <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-v-border rounded-ventura shadow-ventura-md z-50 py-1 animate-fade-in">
                       <button
                         onClick={() => runDemo(sampleEmail)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-p-text hover:bg-p-surface-secondary transition-colors"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-v-text hover:bg-v-surface-secondary transition-colors"
                       >
-                        <svg className="w-4 h-4 text-p-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-v-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        Client Email
+                        Customer Email
                       </button>
                       <button
                         onClick={() => runDemo(samplePO)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-p-text hover:bg-p-surface-secondary transition-colors"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-v-text hover:bg-v-surface-secondary transition-colors"
                       >
-                        <svg className="w-4 h-4 text-p-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-v-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Purchase Order
                       </button>
                       <button
                         onClick={() => runDemo(sampleCSV)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-p-text hover:bg-p-surface-secondary transition-colors"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-[13px] text-v-text hover:bg-v-surface-secondary transition-colors"
                       >
-                        <svg className="w-4 h-4 text-p-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-v-text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                         Messy CSV
                       </button>
-                      <div className="mx-2 my-1 border-t border-p-border-secondary" />
+                      <div className="mx-2 my-1 border-t border-v-border-secondary" />
                       <button
                         onClick={() => runDemo(sampleEdgeCase)}
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-[13px] hover:bg-red-50 transition-colors group"
@@ -218,7 +218,7 @@ export default function Home() {
           {/* Main content */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr,1.1fr] gap-4 flex-1 min-h-0 md:min-h-0 [&>div]:min-h-[500px] md:[&>div]:min-h-0">
             {/* Left panel: Input */}
-            <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
+            <div className="bg-v-surface border border-v-border rounded-ventura-lg shadow-ventura overflow-hidden flex flex-col">
               <DataInput
                 value={rawData}
                 onChange={(v) => { demoAbortRef.current = true; setIsDemo(false); clearImage(); setRawData(v); }}
@@ -232,21 +232,21 @@ export default function Home() {
             </div>
 
             {/* Right panel: Output */}
-            <div className="bg-p-surface border border-p-border rounded-polaris-lg shadow-polaris overflow-hidden flex flex-col">
+            <div className="bg-v-surface border border-v-border rounded-ventura-lg shadow-ventura overflow-hidden flex flex-col">
               {isLoading ? (
                 <ProcessingView startTime={startTimeRef.current} />
               ) : error ? (
                 <div className="flex flex-col items-center justify-center h-full animate-fade-in p-5">
                   <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mb-4">
-                    <svg className="w-6 h-6 text-p-fill-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-v-fill-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <p className="text-[13px] font-semibold text-p-text mb-1">Something went wrong</p>
-                  <p className="text-[11px] text-p-text-secondary text-center max-w-[280px]">{error}</p>
+                  <p className="text-[13px] font-semibold text-v-text mb-1">Something went wrong</p>
+                  <p className="text-[11px] text-v-text-secondary text-center max-w-[280px]">{error}</p>
                   <button
                     onClick={handleClear}
-                    className="mt-4 px-4 py-1.5 text-xs font-medium rounded-polaris-sm bg-p-surface border border-p-border text-p-text-secondary hover:bg-p-surface-secondary transition-colors shadow-polaris-sm"
+                    className="mt-4 px-4 py-1.5 text-xs font-medium rounded-ventura-sm bg-v-surface border border-v-border text-v-text-secondary hover:bg-v-surface-secondary transition-colors shadow-ventura-sm"
                   >
                     Dismiss
                   </button>

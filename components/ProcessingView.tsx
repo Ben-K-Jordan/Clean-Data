@@ -61,8 +61,8 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full py-12">
       <div className="relative w-12 h-12 mb-8">
-        <div className="absolute inset-0 border-[3px] border-p-border rounded-full" />
-        <div className="absolute inset-0 border-[3px] border-transparent border-t-p-fill-brand rounded-full animate-spin" />
+        <div className="absolute inset-0 border-[3px] border-v-border rounded-full" />
+        <div className="absolute inset-0 border-[3px] border-transparent border-t-v-fill-brand rounded-full animate-spin" />
       </div>
 
       <div className="space-y-2 w-full max-w-sm">
@@ -72,9 +72,9 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
           return (
             <div
               key={step.label}
-              className={`flex items-center gap-3 p-2.5 rounded-polaris transition-all duration-300 ${
+              className={`flex items-center gap-3 p-2.5 rounded-ventura transition-all duration-300 ${
                 active
-                  ? "bg-p-surface-secondary border border-p-border"
+                  ? "bg-v-surface-secondary border border-v-border"
                   : done
                   ? "opacity-60"
                   : "opacity-20"
@@ -85,8 +85,8 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
                   done
                     ? "bg-[#cdfee1] text-[#047b5d]"
                     : active
-                    ? "bg-p-fill-brand text-white"
-                    : "bg-p-surface-secondary text-p-text-secondary"
+                    ? "bg-v-fill-brand text-white"
+                    : "bg-v-surface-secondary text-v-text-secondary"
                 }`}
               >
                 {done ? (
@@ -98,10 +98,10 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
                 )}
               </div>
               <div>
-                <div className={`text-[13px] font-medium ${active ? "text-p-text" : "text-p-text-secondary"}`}>
+                <div className={`text-[13px] font-medium ${active ? "text-v-text" : "text-v-text-secondary"}`}>
                   {step.label}
                 </div>
-                <div className="text-[11px] text-p-text-secondary">
+                <div className="text-[11px] text-v-text-secondary">
                   {step.detail}
                 </div>
               </div>
@@ -110,7 +110,7 @@ export default function ProcessingView({ startTime }: ProcessingViewProps) {
         })}
       </div>
 
-      <div className="mt-6 text-[11px] text-p-text-secondary tabular-nums">
+      <div className="mt-6 text-[11px] text-v-text-secondary tabular-nums">
         {(elapsed / 1000).toFixed(1)}s elapsed
       </div>
     </div>

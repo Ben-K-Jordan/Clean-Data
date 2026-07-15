@@ -8,9 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Shopify Structured Orders Demo",
+  title: "Ventura — Structured Orders Demo",
   description:
-    "See how AI transforms messy product data into structured, catalog-matched line items for Shopify.",
+    "See how Ventura's AI turns messy customer emails, POs, and CSVs into structured, catalog-matched orders ready for your ERP.",
 };
 
 export default function RootLayout({

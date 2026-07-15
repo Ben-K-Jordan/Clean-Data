@@ -9,14 +9,14 @@ interface SampleDataProps {
 
 const samples = [
   {
-    label: "Client Email",
+    label: "Customer Email",
     data: sampleEmail,
     icon: (
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     ),
-    desc: "Reorder email from a brand client",
+    desc: "Restock email from a contractor",
   },
   {
     label: "Purchase Order",
@@ -49,21 +49,21 @@ export default function SampleData({ onSelect, active }: SampleDataProps) {
           <button
             key={sample.label}
             onClick={() => onSelect(sample.data)}
-            className={`group flex flex-col items-start gap-1 px-3 py-2.5 text-left rounded-polaris border transition-all ${
+            className={`group flex flex-col items-start gap-1 px-3 py-2.5 text-left rounded-ventura border transition-all ${
               isActive
-                ? "border-p-fill-brand bg-gray-50 shadow-polaris"
-                : "border-p-border bg-p-surface hover:border-gray-300 hover:shadow-polaris-sm"
+                ? "border-v-fill-brand bg-gray-50 shadow-ventura"
+                : "border-v-border bg-v-surface hover:border-gray-300 hover:shadow-ventura-sm"
             }`}
           >
             <div className="flex items-center gap-1.5">
-              <span className={`${isActive ? "text-p-fill-brand" : "text-p-text-secondary group-hover:text-p-text"} transition-colors`}>
+              <span className={`${isActive ? "text-v-fill-brand" : "text-v-text-secondary group-hover:text-v-text"} transition-colors`}>
                 {sample.icon}
               </span>
-              <span className={`text-xs font-semibold ${isActive ? "text-p-fill-brand" : "text-p-text"}`}>
+              <span className={`text-xs font-semibold ${isActive ? "text-v-fill-brand" : "text-v-text"}`}>
                 {sample.label}
               </span>
             </div>
-            <span className="text-[10px] text-p-text-secondary leading-tight">
+            <span className="text-[10px] text-v-text-secondary leading-tight">
               {sample.desc}
             </span>
           </button>

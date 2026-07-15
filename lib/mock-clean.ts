@@ -40,7 +40,7 @@ export function mockClean(rawData: string): CleanResult {
       skusDirect++;
     } else {
       // Count each abbreviation found in the original text
-      const abbrMatches = orig.match(/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|tee|hvy|ltwt|crwneck|crewnck|shrts|chno|soks|beane|bombr|jackt|joggrs|joger|sweatshrt|hodie|hoodey|panl|structurd|6panl|indgo|jns)\b/gi);
+      const abbrMatches = orig.match(/\b(blk|wht|lrg|med|galv|znc|zn|sch|npt|deg|fp|niples?|blts?|nts|vlvs?|valv|washrs|elbws|cuplings|condut|greas|glovs|safty|bronz|threadlockr|blu|brng|hrd|sprl|clr|flt|scrws|lith|12awg|10ft|150lb)\b/gi);
       if (abbrMatches) {
         abbreviationsResolved += abbrMatches.length;
       }
@@ -48,10 +48,10 @@ export function mockClean(rawData: string): CleanResult {
       const origWords = orig.split(/[\s,/\-]+/).filter(w => w.length > 3);
       const prodWords = item.product.toLowerCase().split(/[\s,/\-]+/).filter(w => w.length > 3);
       for (const ow of origWords) {
-        if (/\b(blk|wht|nvy|gry|grn|olv|med|lrg|sml|hvy|ltwt)\b/i.test(ow)) continue; // skip standard abbreviations
+        if (/\b(blk|wht|lrg|med|sml|galv|znc|sch|npt|deg|awg|emt|ptfe|thhn|ep2|a38|fp|gr5)\b/i.test(ow)) continue; // skip standard abbreviations
         // Skip if the word appears exactly in any product word (not a typo)
         if (prodWords.some((pw) => pw === ow)) continue;
-        // Skip simple plural/singular variations (tee vs tees, sock vs socks)
+        // Skip simple plural/singular variations (nipple vs nipples, elbow vs elbows)
         if (prodWords.some((pw) => pw + "s" === ow || ow + "s" === pw)) continue;
         // Skip if it's a prefix/contained word
         if (prodWords.some((pw) => pw.startsWith(ow) || ow.startsWith(pw))) continue;
@@ -113,7 +113,7 @@ function isNonDataLine(line: string): boolean {
     /^-*\s*forward/,
     /^-*\s*from\s+\w+'?s?\s+(email|text|imessage|message)/,
     // Section labels without quantities
-    /^(hoodies?|joggers?|sweatshirts?|outerwear|accessories|denim|shorts?|misc)\b.*[:!]/i,
+    /^(fittings?|fasteners?|valves?|gaskets?|bearings?|safety|electrical|conduit|chemicals?|hardware|misc|accessories)\b.*[:!]/i,
     /^\^+\s/,
     // Short conversational fragments (only if no numbers — they might contain qty)
     /^(yo\s|ok\s|k\s|lol|wait\s|um+\s)[^0-9]*$/,
@@ -157,36 +157,10 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
   cleaned = cleaned
     .replace(/\s*[!?]+\s*$/, "")
     .replace(/\s+(?:pls|plz|please|asap|urgent|lol|lmk|smh|tbh|ngl|ty|thx|tho|thnx|idk|fyi|btw|imo|rn)\s*$/i, "")
-    .replace(/\s*\((?:the\s+)?(?:essential|heavyweight|lightweight|midweight|slim|structured)?\s*(?:ones?|style|type|kind|version)\)\s*$/i, "")
+    .replace(/\s*\((?:the\s+)?(?:sch\s*40|galv(?:anized)?|malleable|brass|bronze|stainless|grade\s*\d+|heavy[\s-]?duty)?\s*(?:ones?|style|type|kind|version|spec)\)\s*$/i, "")
     .trim();
 
-  // 1. SKU pattern first — "SKU-XXXX | qty" or "qty units of SKU-XXXX"
-  const skuWithQtyAfter = cleaned.match(
-    /(SKU-\d+)\s*[|,\t:]\s*(\d+)/i
-  );
-  if (skuWithQtyAfter) {
-    const qty = parseQty(skuWithQtyAfter[2]);
-    if (qty) return matchToCatalog(skuWithQtyAfter[1], qty, "EA", undefined, originalLine);
-  }
-
-  const skuWithQtyBefore = cleaned.match(
-    /(\d+)\s*(?:units?\s+(?:of\s+)?)?(?:.*?)?(SKU-\d+)/i
-  );
-  if (skuWithQtyBefore) {
-    const qty = parseQty(skuWithQtyBefore[1]);
-    if (qty) return matchToCatalog(skuWithQtyBefore[2], qty, "EA", undefined, originalLine);
-  }
-
-  // 2. Tabular: "Product Name | SKU-XXXX | qty | unit | $price"
-  const tableMatch = cleaned.match(
-    /^(.+?)\s*\|\s*(SKU-\d+)\s*\|\s*(\d+)\s*\|\s*(\w+)\s*\|\s*\$?([\d.]+)/i
-  );
-  if (tableMatch) {
-    const qty = parseQty(tableMatch[3]);
-    if (qty) return matchToCatalog(tableMatch[1].trim(), qty, tableMatch[4], parseFloat(tableMatch[5]), originalLine);
-  }
-
-  // 3. "product ... need about QTY of those"
+  // 1. "product ... need about QTY of those"
   const needAboutMatch = cleaned.match(
     /^(.+?)\s*[-–]\s*need\s+(?:about\s+)?(\d+)/i
   );
@@ -195,7 +169,7 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
     if (qty) return matchToCatalog(needAboutMatch[1].trim(), qty, "EA", undefined, originalLine);
   }
 
-  // 4. Strict CSV: product,qty,$price
+  // 2. Strict CSV: product,qty,$price
   const strictCsvMatch = cleaned.match(
     /^["']?(.+?)["']?,\s*(\d+)\s*,\s*\$?([\d.]+)/i
   );
@@ -204,7 +178,7 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
     if (qty) return matchToCatalog(strictCsvMatch[1].trim(), qty, "EA", parseFloat(strictCsvMatch[3]), originalLine);
   }
 
-  // 5. Pipe/tab separated: "product | qty | unit | $price"
+  // 3. Pipe/tab separated: "product | qty | unit | $price"
   const pipeSepMatch = cleaned.match(
     /^["']?(.+?)["']?\s*[|\t]\s*(\d+)\s*[|\t]?\s*(ea|each|pcs|units?)?/i
   );
@@ -220,7 +194,7 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
     }
   }
 
-  // 6. "QTY units/rolls/etc of PRODUCT"
+  // 4. "QTY units/rolls/etc of PRODUCT"
   const unitsOfMatch = cleaned.match(
     /^(\d+)\s*(?:units?|pcs|packs?|boxes?)\s+(?:of\s+)?(.+?)(?:\s*\(.*\))?$/i
   );
@@ -229,7 +203,7 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
     if (qty) return matchToCatalog(unitsOfMatch[2].trim(), qty, "EA", undefined, originalLine);
   }
 
-  // 7. "QTYx PRODUCT"
+  // 5. "QTYx PRODUCT"
   const qtyXMatch = cleaned.match(
     /^(\d+)\s*[x×]\s*(.+?)(?:\s*[@$]\s*([\d.]+))?$/i
   );
@@ -238,7 +212,7 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
     if (qty) return matchToCatalog(qtyXMatch[2].trim(), qty, "EA", qtyXMatch[3] ? parseFloat(qtyXMatch[3]) : undefined, originalLine);
   }
 
-  // 8. "PRODUCT - QTY" or "PRODUCT: QTY" (product first, qty after separator)
+  // 6. "PRODUCT - QTY" or "PRODUCT: QTY" (product first, qty after separator)
   const productThenQty = cleaned.match(
     /^(.+?)\s*[-–:]\s*(\d+)\s*(?:units?|pcs|pairs?|ea)?$/i
   );
@@ -250,7 +224,7 @@ function extractLineItem(line: string, rawLine?: string): LineItem | null {
     }
   }
 
-  // 9. "QTY PRODUCT" (generic — must be last)
+  // 7. "QTY PRODUCT" (generic — must be last)
   const qtyProductMatch = cleaned.match(
     /^(\d+)\s+(.+?)(?:\s*[@$]\s*([\d.]+))?$/i
   );
