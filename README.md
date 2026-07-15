@@ -30,7 +30,7 @@ This demo shows the AI-native version of that workflow end to end: paste anythin
 - **Scores its own confidence**: every match gets a 63-99% confidence band derived from word coverage and edit distance, shown as a per-row meter
 - **Keeps a human in the loop**: unmatched items are flagged, and the "Send to ERP" button stays locked until a person accepts or rejects each one, with totals recomputing live
 - **Shows the receipts**: hover any row to see the exact original text it was extracted from
-- **Works with zero setup**: no API key needed, since a deterministic mock parser powers the whole demo offline
+- **Works with zero setup**: no API key needed, since a rules-based mock parser powers the whole demo offline
 
 ## Try it in 60 seconds
 
@@ -51,13 +51,13 @@ cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 
 ## How it works
 
-<img src="docs/architecture.png" alt="Architecture: input goes to POST /api/clean, which routes to either a hosted LLM (with the catalog in-prompt) or the deterministic mock parser plus fuzzy catalog matcher; both produce structured line items with per-line confidence, feeding the order review UI and then the ERP / CSV export" width="1000" />
+<img src="docs/architecture.png" alt="Architecture: input goes to POST /api/clean, which routes to either a hosted LLM (with the catalog in-prompt) or the rules-based mock parser plus fuzzy catalog matcher; both produce structured line items with per-line confidence, feeding the order review UI and then the ERP / CSV export" width="1000" />
 
 One API route, two interchangeable engines:
 
 | Mode | When | Engine |
 |---|---|---|
-| **Mock** (default) | No API key | Deterministic pipeline: junk-line filtering → multi-item splitting → 7 regex extraction patterns → fuzzy catalog matching → Levenshtein-based confidence model |
+| **Mock** (default) | No API key | Rules-based pipeline: junk-line filtering → multi-item splitting → 7 regex extraction patterns → fuzzy catalog matching → Levenshtein-based confidence model |
 | **AI** | `ANTHROPIC_API_KEY` set | Hosted LLM with the catalog in-prompt; handles text and images (handwritten orders) |
 
 The mock mode isn't a stub. It's a real parsing pipeline that survives the same messy inputs, so the demo is fully interactive offline and the AI path is a drop-in upgrade.
