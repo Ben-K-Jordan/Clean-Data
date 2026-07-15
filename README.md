@@ -6,10 +6,7 @@
 
 The interactive demo I ran on customer calls as a co-founder of [Ventura](https://ventura.ai/) (YC W26), where we built AI quoting and order entry for industrial distributors.
 
-![Next.js 14](https://img.shields.io/badge/Next.js_14-000000?logo=nextdotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white)
-![AI mode](https://img.shields.io/badge/AI_mode-optional-475569)
+**Next.js 14 · TypeScript · Tailwind CSS · optional AI mode**
 
 <img src="docs/demo.gif" alt="Demo: a forwarded text-message order is parsed, matched to the catalog, one item is flagged for human review, resolved, and sent to the ERP" width="900" />
 
