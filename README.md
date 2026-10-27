@@ -8,7 +8,7 @@ The interactive demo I ran on customer calls as a co-founder of [Ventura](https:
 
 **Next.js 14 · TypeScript · Tailwind CSS · optional AI mode**
 
-<img src="docs/demo.gif" alt="Demo: a forwarded text-message order is parsed into 20 catalog-matched line items, one unknown item is flagged, a person skips it, and the rest is sent to the ERP" width="900" />
+<img src="docs/demo.gif" alt="Demo: a forwarded text-message order is parsed into 20 line items, one item that matches nothing in the catalog is flagged, a person skips it, and the rest is sent to the ERP" width="900" />
 
 *The Edge Case demo: forwarded iMessage chaos becomes 20 structured line items. The one it can't match gets flagged, a person skips it, and the rest goes to the ERP.*
 
