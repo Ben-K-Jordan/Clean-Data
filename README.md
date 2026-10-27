@@ -8,9 +8,9 @@ The interactive demo I ran on customer calls as a co-founder of [Ventura](https:
 
 **Next.js 14 · TypeScript · Tailwind CSS · optional AI mode**
 
-<img src="docs/demo.gif" alt="Demo: a forwarded text-message order is parsed, matched to the catalog, one item is flagged for human review, resolved, and sent to the ERP" width="900" />
+<img src="docs/demo.gif" alt="Demo: a forwarded text-message order is parsed into 20 catalog-matched line items, one unknown item is flagged, a person skips it, and the rest is sent to the ERP" width="900" />
 
-*The Edge Case demo: forwarded iMessage chaos becomes 20 structured line items, one gets flagged for review, and the order goes to the ERP.*
+*The Edge Case demo: forwarded iMessage chaos becomes 20 structured line items. The one it can't match gets flagged, a person skips it, and the rest goes to the ERP.*
 
 </div>
 
@@ -48,13 +48,13 @@ cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 
 ## How it works
 
-<img src="docs/architecture.png" alt="Architecture: input goes to POST /api/clean, which routes to either a hosted LLM (with the catalog in-prompt) or the rules-based mock parser plus fuzzy catalog matcher; both produce structured line items with per-line confidence, feeding the order review UI and then the ERP / CSV export" width="1000" />
+<img src="docs/architecture.png" alt="Architecture: input goes to POST /api/clean. With an API key, a hosted LLM handles text and photos with the catalog in the prompt. Without one, text goes through the rules-based parser and fuzzy catalog matcher, and photos return a built-in sample result. Every path produces structured line items with per-line confidence, which go to human review before the ERP handoff or CSV export." width="1000" />
 
 One API route, two interchangeable engines:
 
 | Mode | When | Engine |
 |---|---|---|
-| **Mock** (default) | No API key | Rules-based pipeline: junk-line filtering → multi-item splitting → 7 regex extraction patterns → fuzzy catalog matching → Levenshtein-based confidence model |
+| **Mock** (default) | No API key | Rules-based pipeline for text: junk-line filtering → multi-item splitting → 7 regex extraction patterns → fuzzy catalog matching → Levenshtein-based confidence model. Photos return a built-in sample result. |
 | **AI** | `ANTHROPIC_API_KEY` set | Hosted LLM with the catalog in-prompt; handles text and images (handwritten orders) |
 
 The mock mode isn't a stub. It's a real parsing pipeline that survives the same messy inputs, so the demo is fully interactive offline and the AI path is a drop-in upgrade.
@@ -63,7 +63,7 @@ The mock mode isn't a stub. It's a real parsing pipeline that survives the same 
 
 | File | What's in it |
 |---|---|
-| [`lib/mock-clean.ts`](lib/mock-clean.ts) | The deterministic pipeline: junk-line detection (greetings, PO metadata, section headers), multi-item line splitting, seven ordered extraction patterns, and an insights pass that counts typos fixed and abbreviations resolved |
+| [`lib/mock-clean.ts`](lib/mock-clean.ts) | The rules-based pipeline: junk-line detection (greetings, PO metadata, section headers), multi-item line splitting, seven ordered extraction patterns, and an insights pass that counts typos fixed and abbreviations resolved |
 | [`lib/catalog.ts`](lib/catalog.ts) | 23-SKU industrial catalog (fasteners, pipe & fittings, valves, gaskets, bearings, safety, electrical, MRO) with alias-based fuzzy matching and word-overlap scoring |
 | [`lib/samples.ts`](lib/samples.ts) | Four handcrafted worst-case inputs, every line verified end-to-end against the parser (the PO's line items sum exactly to its stated total) |
 | [`lib/ai-clean.ts`](lib/ai-clean.ts) | The LLM integration: structured-JSON extraction with the catalog in-prompt, vision support, and defensive response validation |
